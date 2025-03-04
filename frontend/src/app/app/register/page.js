@@ -1,30 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image"
 
 const RegistrationPage = () => {
   const [selectedRole, setSelectedRole] = useState("STUDENT");
 
   return (
     <div className="flex h-screen">
-    <div className="w-1/2 bg-blue-600 flex items-center justify-center">
-      <img
-        src="https://scontent-mad1-1.xx.fbcdn.net/v/t39.30808-6/348457071_1440099213491800_7980231977094495645_n.png?_nc_cat=105&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=kdlvvceGMCIQ7kNvgFYCcaN&_nc_oc=AdiBezAmMGaHyC3naDrdCGK8Qm2fMkQkeLK5Uwb6fM7UigeCjk-gnPTVvawU8kpJ27Y&_nc_zt=23&_nc_ht=scontent-mad1-1.xx&_nc_gid=Ao9nj7VE-RINHqW4uAQ7XHh&oh=00_AYDacmI2t4kv13kWSaTX21mGqYTMl2dysyLQMHb3s64KYQ&oe=67C29D44"
-        alt="Logo"
-        className="w-2/3 h-auto"
-      />
-    </div>
+    <div className="w-1/2 bg-blue-600 flex justify-center items-center">
+        <Image
+          src="/u-tad-logo.png"
+          alt="U-Tad Logo"
+          width={700}
+          height={600}
+          className="max-h-full object-contain"
+        />
+      </div>
+      
 
       {/* Right Section with the Form */}
       <div className="w-1/2 p-8 flex flex-col justify-center">
         <button className="text-xl">&#8592;</button>
         <h1 className="text-4xl font-extrabold font-montserrat ml-60">Welcome to PCA</h1>
-        <p className="text-gray-500 mb-8 ml-72">please enter your details</p>
+        <p className="text-gray-500 mb-8 ml-72 font-montserrat">please enter your details</p>
 
         <div className="flex gap-4 mb-4">
           <button
             className={`px-4 py-2 border ${
-              selectedRole === "STUDENT" ? "bg-blue-50 text-blue-600" : "text-gray-500"
+              selectedRole === "STUDENT" ? "bg-blue-50 font-montserrat text-custom-utad-logo" : "text-gray-500"
             }`}
             onClick={() => setSelectedRole("STUDENT")}
           >
@@ -32,7 +36,7 @@ const RegistrationPage = () => {
           </button>
           <button
             className={`px-4 py-2 border ${
-              selectedRole === "TEACHER" ? "bg-white-50 border-blue-500 text-blue-500" : "text-blue-500"
+              selectedRole === "TEACHER" ? "bg-white-50 font-montserrat border-custom-utad-logo text-custom-utad-logo" : "text-custom-utad-logo"
             }`}
             onClick={() => setSelectedRole("TEACHER")}
           >
@@ -45,13 +49,13 @@ const RegistrationPage = () => {
             <label className="block font-black font-montserrat">Name</label>
             <input
               type="text"
-              className="w-full border-b-4 border-blue-500 outline-none"
+              className="w-full border-b-4 border-custom-utad-logo outline-none"
             />
           </div>
 
           <div>
             <label className="block font-black font-montserrat">Studies</label>
-            <select className="w-full border-b-4 border-blue-500 outline-none py-2 text-blue-500">
+            <select className="w-full border-b-4 border-custom-utad-logo outline-none py-2 text-custom-utad-logo">
               <option>B.S. COMPUTER SCIENCE</option>
               <option>B.S. DOUBLE DEGREE IN COMPUTATIONAL MATHEMATICS AND COMPUTER SCIENCE</option>
               <option>B.S. DOUBLE DEGREE IN COMPUTATIONAL PHYSICS AND COMPUTER SCIENCE</option>
@@ -68,7 +72,7 @@ const RegistrationPage = () => {
             <label className="block font-black font-montserrat">Email</label>
             <input
               type="email"
-              className="w-full border-b-4 border-blue-500 outline-none"
+              className="w-full border-b-4 border-custom-utad-logo outline-none"
             />
           </div>
 
@@ -76,16 +80,16 @@ const RegistrationPage = () => {
             <label className="block font-black font-montserrat">Passwords</label>
             <input
               type="password"
-              className="w-full border-b-4 border-blue-500 outline-none"
+              className="w-full border-b-4 border-custom-utad-logo outline-none"
             />
           </div>
 
-          <button className="bg-blue-500 text-white py-3 rounded-md">
+          <button className="bg-custom-utad-logo font-montserrat text-white py-3 rounded-md">
             CREATE ACCOUNT
           </button>
         </form>
 
-        <p className="mt-4 text-blue-500">
+        <p className="mt-4 font-montserrat text-custom-utad-logo">
           A confirmation code will be sent to your email
         </p>
       </div>
