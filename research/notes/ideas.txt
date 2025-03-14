@@ -1,5 +1,24 @@
-use regex to scrape websites from CVs
-   then scrape text from those websites (theyve got to me cv / personal projects ... and such, personal sites)
-   (github, wordpress)
+Research ideas:
+    - Look into ways of hosting this server
+    - Experiment with prompts => what problems can be somewhat reliably be solved using llms?
 
-use summarization or break text into chunks if it doesnt fit in LLM (unlikely though)
+TODO: 
+    - FINISH THE TODOs IN THE CODE
+    - Make emails have visually appealling -> stylise / customise emails
+
+what data is of interest? 
+    - Current uni degree + mention
+    - CVs (diverse data about education, skills, interest, employment)
+    - University grades -> most ppl dont like their grades being snooped
+    - Portfolio website containing CV / showcasing personal projects
+    - area/field of interest, companies of interest (if they want to go to a specific company)
+
+
+HONESTLY, IT DOESNT MATTER AN APPLICANT'S GRADES, ALL IT MATTERS IS WHAT THEY ARE STUDYING, ANY PERSONAL PROJECTS
+AND SKILLS (THEY ARE GOING TO TALK EITHER ABOUT 1) WHAT THEY ARE GOOD AT 2) WHAT THEY LIKE  
+
+Because a potential employer will then look into that applicant's expertise, and may or may not be interest in the applicant
+what is important is steering applicants in the right directions, based on their interests and strengths
+
+=> based on this data, we can give recommendations
+
