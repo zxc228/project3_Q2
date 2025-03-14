@@ -1,0 +1,5 @@
+use regex to scrape websites from CVs
+   then scrape text from those websites (theyve got to me cv / personal projects ... and such, personal sites)
+   (github, wordpress)
+
+use summarization or break text into chunks if it doesnt fit in LLM (unlikely though)
