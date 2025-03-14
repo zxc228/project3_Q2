@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+        }
+      }
+    </script>
+</head>
+<body>
+    <script type="module" src="/main.js"></script>
+    <header id="header">U-TAD CAREER COACH!</header>
+    <form id="uploadForm">
+        <label> Your CV (in docx or PDF)</label>
+        <label for="file" class="file-upload-button">Upload CV</label>
+        <input type="file" name="file" id="file" required>
+        <input type="text" name="email" id="email" placeholder="Enter an email" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const fd = new FormData();
+            fd.append('file', document.getElementById('file').files[0]);
+            fd.append('email', document.getElementById('email').value);
+
+            const res = await fetch('http://127.0.0.1:3000/api/file', { method: 'POST', body: fd })
+            console.log(res.status)
+            //document.getElementById('result').textContent = res.status
+        })
+    </script>
+</body>
+</html>

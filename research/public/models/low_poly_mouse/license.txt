@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Computer Mouse Free
+* source:	https://sketchfab.com/3d-models/low-poly-computer-mouse-free-bd0176444b9043ccbcf82e9e27346c78
+* author:	Dimitri (https://sketchfab.com/dimitri_blender)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Computer Mouse Free" (https://sketchfab.com/3d-models/low-poly-computer-mouse-free-bd0176444b9043ccbcf82e9e27346c78) by Dimitri (https://sketchfab.com/dimitri_blender) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

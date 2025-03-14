@@ -1,0 +1,62 @@
+{
+  "Software Engineering": [
+    "Programming (C, C++, Java, Python, JavaScript, Rust, etc.)",
+    "Data Structures & Algorithms",
+    "Object-Oriented Design (OOD)",
+    "Microservices Architecture",
+    "API Development (REST, GraphQL)",
+    "Multithreading & Concurrency",
+    "Database Management (SQL, NoSQL)",
+    "Software Testing & Debugging",
+    "Version Control (Git, GitHub, GitLab)",
+    "Containerization (Docker, Kubernetes)"
+  ],
+  "Data Engineering": [
+    "SQL & NoSQL Databases",
+    "ETL Pipelines",
+    "Big Data Processing (Hadoop, Spark)",
+    "Data Warehousing (Redshift, Snowflake)",
+    "Cloud Data Services (AWS, GCP, Azure)",
+    "Streaming Data (Kafka, Flink)",
+    "Data Modeling & Normalization",
+    "Data Governance & Security",
+    "Scripting (Python, SQL, Bash)",
+    "Data Pipeline Orchestration (Airflow, Prefect)"
+  ],
+  "Cybersecurity": [
+    "Network Security",
+    "Penetration Testing",
+    "Cryptography",
+    "Threat Hunting & Intelligence",
+    "Incident Response & Forensics",
+    "Secure Coding Practices",
+    "Firewall & IDS/IPS Management",
+    "Cloud Security",
+    "Zero Trust Architecture",
+    "Compliance & Risk Management (ISO 27001, NIST, GDPR)"
+  ],
+  "Graphics / Simulations / Game Development": [
+    "3D Rendering (OpenGL, Vulkan, DirectX)",
+    "Game Engines (Unity, Unreal Engine, Godot)",
+    "Physics Simulation",
+    "Shader Programming (GLSL, HLSL)",
+    "Real-Time Rendering Techniques",
+    "Procedural Generation",
+    "AI for Games (Pathfinding, Behavior Trees)",
+    "VR/AR Development",
+    "Mathematics for Graphics (Linear Algebra, Quaternions)",
+    "Optimization & Performance Tuning"
+  ],
+  "Management": [
+    "Agile & Scrum Methodologies",
+    "Project Management",
+    "Software Development Lifecycle (SDLC)",
+    "People & Team Management",
+    "Stakeholder Communication",
+    "Risk Assessment & Mitigation",
+    "Technical Roadmap Planning",
+    "Budgeting & Resource Allocation",
+    "Product Strategy",
+    "Mentorship & Coaching"
+  ]
+}
