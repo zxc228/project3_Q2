@@ -47,7 +47,6 @@ const job = async (cv) => {
         What one or two career paths would you advice the applicant to take. 
         What course of action should the applicant take to get there?`
     const advice = await Lima.chat(p2).then(r => Lima.filterThinking(r.response))
-    console.log(cvSummary + advice)
     return cvSummary + advice
 }
 
