@@ -1,6 +1,6 @@
 # 🧠AI✨ Feature 🍌🙉 ... and 👨‍🔬Research🧪
 
-## Description of each Directory:
+## Description of each Directory 📜
 - `notes` contains the **rokes-skills jsons**, and some brainstorming
 - `public` contains a static site that is hosted / served by the server
 - `src`
@@ -15,7 +15,7 @@
         - `constants.js` Just contants stored there.
         - `jwt.js` **[Unused]** Just some code on how to use JSON Web Tokens
 
-## Setup
+## Setup 🏗️
  1. Install Ollama
      - On **UNIX**: `curl -fsSL https://ollama.com/install.sh | sh`
      - On **Mac**, download from [Ollama](https://ollama.com/download/mac)
@@ -24,7 +24,7 @@
  3. Check ollama server is running (default) on port `11434` (default). Just run `ollama serve`
  4. Install npm dependencies with `npm update`
 
-## Run
+## Run 🏎️
 Run with `npm start` or `node src/server.js`
 
 
