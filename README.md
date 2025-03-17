@@ -25,7 +25,7 @@
  4. Install npm dependencies with `npm update`
 
 ## Run 🏎️
-Run with `npm start` or `node src/server.js`
-
+1. Run with `npm start` or `node src/server.js`
+2. Open static site in the browser at `localhost:3000/index.html`
 
 
