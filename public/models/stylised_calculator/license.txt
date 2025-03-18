@@ -1,0 +1,11 @@
+Model Information:
+* title:	Stylised Calculator
+* source:	https://sketchfab.com/3d-models/stylised-calculator-c65c525ea66d4b3c96dc023f8c616840
+* author:	Sophuwu (https://sketchfab.com/Sophuwu)
+
+Model License:
+* license type:	CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
+* requirements:	Author must be credited. Modified versions must have the same license. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stylised Calculator" (https://sketchfab.com/3d-models/stylised-calculator-c65c525ea66d4b3c96dc023f8c616840) by Sophuwu (https://sketchfab.com/Sophuwu) licensed under CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
