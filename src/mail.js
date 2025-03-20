@@ -11,9 +11,14 @@ class Mail {
         auth: { user: "senenm74@gmail.com", pass: process.env.GOOGLE_APP },
     })
 
-    static async send(email, text) {
-        const mailObj = { from: Mail.from, subject: Mail.subject, to: email, text: text }
-        return await Mail.transporter.sendMail(mailObj) // return info object (with info.messageId)
+    static async send(email, obj) {
+        if (obj.text) {
+            const mailObj = { from: Mail.from, subject: Mail.subject, to: email, text: obj.text }
+            return await Mail.transporter.sendMail(mailObj) // return info object (with info.messageId)
+        } else if (obj.html) {
+            const mailObj = { from: Mail.from, subject: Mail.subject, to: email, html: obj.html }
+            return await Mail.transporter.sendMail(mailObj) // return info object (with info.messageId)
+        }
     }
 }
 

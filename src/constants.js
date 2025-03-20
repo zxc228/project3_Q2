@@ -13,6 +13,14 @@ const mimes = {
 
 const prefix = 'You are a career mentoring tutor.'
 
+const roles = JSON.stringify({
+  "Software Engineering": ["Frontend Developer", "Backend Developer", "Full-Stack Developer", "Embedded Systems Engineer", "DevOps Engineer", "Site Reliability Engineer (SRE)", "Cloud Engineer", "System Software Engineer", "QA Engineer"],
+  "Data Engineering": ["Data Engineer","Big Data Engineer","ETL Developer","Data Architect","ML Ops Engineer","Database Administrator (DBA)","Data Scientist"],
+  "Cybersecurity": ["Security Engineer","Penetration Tester","Incident Response Analyst","Threat Intelligence Analyst","Cryptography Engineer","Cloud Security Engineer","SOC Analyst"],
+  "Graphics / Simulations / Game Development": ["Game Developer","Graphics Programmer","Simulation Engineer","Rendering Engineer","Technical Artist","VR/AR Developer","Physics Programmer"],
+  "Management": ["Engineering Manager","Technical Lead","CTO (Chief Technology Officer)","VP of Engineering","Product Manager","Project Manager","Scrum Master","DevOps Manager"]
+})
+
 const roles_skills = JSON.stringify({
     "Software Engineering": {
         "Frontend Developer": ["HTML", "CSS", "JavaScript", "React", "Angular", "Vue.js", "TypeScript", "SASS", "Webpack", "Responsive Design", "Git", "UI/UX Design", "Version Control"],
@@ -254,4 +262,4 @@ const roles_skills_tech = JSON.stringify({
 })
 
 
-module.exports = { mimes, roles_skills, roles_skills_tech, prefix }
+module.exports = { mimes, roles, roles_skills, roles_skills_tech, prefix }

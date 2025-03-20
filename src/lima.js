@@ -7,7 +7,7 @@ class Lima {
     static dec = new TextDecoder()
     static model = 'llama3.2:3b-instruct-q5_K_M'
     static url = 'http://127.0.0.1:11434/api/'
-    static timeout = 600000
+    static timeout = 1200000
     static reqData = {
         method: 'POST', 
         headers: {'Content-Type': 'Application/json'}, 

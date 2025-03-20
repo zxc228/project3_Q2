@@ -15,3 +15,7 @@ what data is of interest?
 
 Because a potential employer will then look into that applicant's expertise, and may or may not be interest in the applicant
 what is important is steering applicants in the right directions, based on their interests and strengths, not their grades ... but whatever
+
+
+AGENT:
+Act as a mentor for senior Computer Science and Software Engineering students. Giving them guidance on what career paths they can pursue based on their strengths and interests, and what steps to take to achieve said career paths. Generate a maximum of 4 recommended career paths and 4 steps to take for each career path. Generate the answers in markdown text.
