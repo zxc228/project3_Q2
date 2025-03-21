@@ -1,17 +1,6 @@
 import * as THREE from 'three'
-import { Vector3 } from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-
-//import { FontLoader } from 'three/addons/loaders/FontLoader.js'
-//import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
-//import typefaceFont from 'three/examples/fonts/helvetiker_regular.typeface.json'
-
-/*
-import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier3d-compat'
-RAPIER.init().then(() => { _run_simulation(RAPIER) })
-*/
-
 
 class Karen {
     constructor(fov) {

@@ -34,6 +34,7 @@
             fd.append('email', document.getElementById('email').value);
 
             const res = await fetch('http://127.0.0.1:3000/api/file', { method: 'POST', body: fd })
+            //const res = await fetch('https://e166-212-0-109-168.ngrok-free.app/api/file', {method: 'POST', body: fd})
             console.log(res.status)
             //document.getElementById('result').textContent = res.status
         })

@@ -5,9 +5,8 @@
 */
 class Lima {
     static dec = new TextDecoder()
-    static model = 'llama3.2:3b-instruct-q5_K_M'
+    static model = 'deepseek-r1:7b' // 'llama3.2:3b-instruct-q5_K_M'
     static url = 'http://127.0.0.1:11434/api/'
-    static timeout = 1200000
     static reqData = {
         method: 'POST', 
         headers: {'Content-Type': 'Application/json'}, 
@@ -35,19 +34,19 @@ class Lima {
     }
 
     static async chat(prompt) {
-        Lima.reqData.body = JSON.stringify({timeout: Lima.timeout, model: Lima.model, prompt: prompt, stream: false})
+        Lima.reqData.body = JSON.stringify({ model: Lima.model, prompt: prompt, stream: false })
         return await fetch(`${Lima.url}generate`, Lima.reqData).then(r => r.json())
     }
 
     static async chatStreaming(prompt, cb) {
-        Lima.reqData.body = JSON.stringify({timeout: Lima.timeout, model: Lima.model, prompt: prompt})
+        Lima.reqData.body = JSON.stringify({ model: Lima.model, prompt: prompt })
         const res = await fetch(`${Lima.url}generate`, Lima.reqData)
         if (!res.ok) throw new Error(`SHOOT!: ${res.status}`)
 
         if (cb && typeof cb === 'function') for await (const chonker of res.body) cb(chonker)
         else return async function* asyncGenerator() {
             for await (const chonker of res.body) yield chonker
-        }()
+        }() 
     }
 }
 
