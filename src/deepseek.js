@@ -10,7 +10,7 @@ class DeepSeek {
         return await this.ai.chat.completions.create({
             model: this.model,
             messages: [{ 
-                role: this.model === DeepSeek.MODELS.CHAT ? 'system' : 'user',
+                role: this.model === Models.CHAT ? 'system' : 'user',
                 content: msg 
             }] 
         })

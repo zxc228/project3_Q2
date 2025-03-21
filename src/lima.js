@@ -23,7 +23,6 @@ class Lima {
         return JSON.parse(Lima.dec.decode(chunk))
     }
 
-    // use this to filter out <think>...</think> block from a string
     static filterThinking(text) {
         const str = new String(text)
         return str.replace(str.match(/<think>[\s\S]*?<\/think>/g), '').trim()
