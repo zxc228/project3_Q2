@@ -1,89 +1,218 @@
+"use client";
 import React from "react";
+import { useState } from "react";
 
 const Dashboard = () => {
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState("progress");
+
+  const careerTracks = ["DATA ANALYST", "FRONTEND DEV", "BACKEND DEV"];
+  const skills = [
+    { name: "Data Mining", current: 5 },
+    { name: "Data Visualization", current: 4 },
+    { name: "Data Cleaning", current: 3.5 },
+    { name: "Python", current: 3 },
+  ];
+
+  const [courses, setCourses] = useState([
+    { id: 1, expanded: true },
+    { id: 2, expanded: true },
+  ]);
+  
+  
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 text-blue-600">
       {/* Sidebar */}
-      <aside className="w-64 bg-black text-white p-5 flex flex-col min-h-screen">
+      <aside className="w-64 bg-blue-600 text-white p-5 flex flex-col min-h-screen">
         <div className="text-lg font-bold mb-5">U-Tad</div>
         <nav className="flex-grow">
           <ul>
             <li className="mb-2 cursor-pointer">Profile</li>
-            <li className="mb-2 cursor-pointer">Dashboard</li>
+            <li className="mb-2 cursor-pointer font-bold">Dashboard</li>
             <li className="mb-2 cursor-pointer">Career Roadmap</li>
           </ul>
         </nav>
-        <button className="mt-auto border border-white px-4 py-2">Sign Out</button>
+        <button className="mt-auto border border-white px-4 py-2">Sign out</button>
       </aside>
-      
-      {/* Main Content */}
-      <main className="flex-1 p-10">
-        {/* Profile Section */}
-        <div className="p-6 bg-white shadow rounded flex justify-between items-center relative">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-            <div>
-              <div className="w-40 h-4 bg-gray-300 rounded-md"></div>
-              <div className="mt-2 w-40 h-2 bg-green-500 rounded-md"></div>
-            </div>
-          </div>
-          {/* Centered Date and Offer Button */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center bg-white p-2 rounded shadow-md">
-            <p className="text-black font-semibold">Date</p>
-            <button className="mt-2 bg-black text-white px-4 py-2 rounded">Search Similar Offers</button>
-          </div>
-          {/* Notifications Section */}
-          <div className="absolute right-6 top-6 w-48 bg-gray-200 rounded p-4 shadow-md z-20">
-            <p className="text-black font-semibold">Notifications</p>
-            <div className="mt-2 w-full h-6 bg-white rounded shadow"></div>
-          </div>
-        </div>
-        
-        {/* Personal Path */}
-        <div className="mt-6 p-6 bg-white shadow rounded">
-          <h3 className="font-semibold text-black">Personal Path</h3>
-          <div className="relative flex items-center justify-between mt-4">
-            <div className="absolute top-1/2 left-0 w-full h-[2px] bg-black"></div>
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="relative flex items-center">
-                <div className="w-6 h-6 bg-blue-600 rounded-full relative z-10"></div>
+
+      {/* Main content */}
+      <main className="flex-1 p-6 relative">
+        {/* Top bar */}
+        <div className="flex justify-end items-center gap-4 mb-6">
+          <button onClick={() => setNotificationsOpen(!notificationsOpen)} className="relative">
+            <span className="material-icons text-3xl">🔔</span>
+            {notificationsOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-white border rounded shadow p-4">
+                <p>No Notifications</p>
               </div>
-            ))}
+            )}
+          </button>
+        </div>
+
+         {/* Self Assessment placeholder */}
+         <section className="bg-white p-6 shadow rounded mb-6">
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold text-lg">Self-Assessment</h2>
+            <button className="border px-4 py-2 rounded">Complete Self-Assessment</button>
           </div>
-        </div>
-        
-        {/* Course Recommendations */}
-        <h3 className="mt-6 text-lg font-semibold text-black">Course Recommendations</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 bg-white shadow rounded p-4 flex flex-col justify-between">
-              <div className="h-16 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-blue-600 rounded-md w-full"></div>
+          <div className='mt-4'>
+            <div className='bg-gray-200 p-4 rounded mb-2 flex justify-between items-center'>
+              <div>
+                <p className='font-semibold'>Self-Assessment Results</p>
+                <p className='text-sm text-gray-600'>Date completed: 05/03/2025</p>
+              </div>
+              <div className='flex gap-2'>
+                <span className='material-icons'>👁️</span>
+                <span className='material-icons'>⬇️</span>
+              </div>
             </div>
-          ))}
-        </div>
-        
-        {/* Your Courses */}
-        <h3 className="mt-6 text-lg font-semibold text-black">Your Courses</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-          {[0, 0].map((value, i) => (
-            <div key={i} className="h-32 bg-white shadow rounded p-4 flex flex-col justify-between">
-              <div className="h-16 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-400 rounded-md w-full text-center text-black font-bold">{value}%</div>
+            <div className='bg-gray-200 p-4 rounded mb-4 flex justify-between items-center'>
+              <div>
+                <p className='font-semibold'>Self-Assessment Results</p>
+                <p className='text-sm text-gray-600'>Date completed: 04/01/2025</p>
+              </div>
+              <div className='flex gap-2'>
+                <span className='material-icons'>👁️</span>
+                <span className='material-icons'>⬇️</span>
+              </div>
             </div>
-          ))}
-        </div>
-        
-        {/* Internships Near You */}
-        <h3 className="mt-6 text-lg font-semibold text-black">Internships Near You</h3>
-        <div className="mt-2 p-4 bg-white shadow rounded flex">
-          <div className="w-1/3 flex flex-col gap-2">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-10 bg-gray-200 rounded"></div>
-            ))}
+            <button className='mx-auto block border px-4 py-2 rounded bg-white'>See More</button>
           </div>
-          <div className="w-2/3 h-64 bg-gray-300 flex items-center justify-center text-black font-semibold">Map placeholder</div>
-        </div>
+        </section>
+
+        {/* Career Track and Skills */}
+        <section className="bg-white p-6 shadow rounded mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-semibold flex items-center gap-2">
+              Career Track:
+              <select
+                value={selectedTrack}
+                onChange={(e) => setSelectedTrack(e.target.value)}
+                className="border rounded px-2 py-1"
+              >
+                {careerTracks.map((track) => (
+                  <option key={track} value={track}>{track}</option>
+                ))}
+              </select>
+            </h2>
+            <button className="border px-4 py-2 rounded">Generate PDF</button>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Skills</h3>
+            <ul className="space-y-3">
+              {skills.map((skill, i) => (
+                <li key={i} className="flex items-center gap-4">
+                  <span className="w-48">{skill.name}</span>
+                  <div className="relative bg-gray-300 h-2 flex-1 rounded">
+                    <div
+                      className="bg-blue-600 h-2 rounded"
+                      style={{ width: `${(skill.current / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span>{skill.current}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Personal Progress Section */}
+        <section className={`bg-white p-6 shadow rounded transition-all ${isExpanded ? "fixed inset-0 z-50 overflow-y-auto" : "mb-6"}`}>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-4">
+              <h2 className="font-semibold">{activeTab === "progress" ? "Personal Progress" : "Progress Review"}</h2>
+              <div className="ml-4 bg-gray-200 rounded-full w-24 h-6 flex items-center">
+                <div
+                  onClick={() => setActiveTab("progress")}
+                  className={`w-1/2 h-full flex justify-center items-center cursor-pointer rounded-full ${activeTab === "progress" ? "bg-black text-white" : ""}`}
+                >
+                  ●
+                </div>
+                <div
+                  onClick={() => setActiveTab("review")}
+                  className={`w-1/2 h-full flex justify-center items-center cursor-pointer rounded-full ${activeTab === "review" ? "bg-black text-white" : ""}`}
+                >
+                  ●
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setIsExpanded(!isExpanded==true)} className="text-2xl">⛶</button>
+              <button className="text-2xl">➕</button>
+              <button className="text-2xl">🗑️</button>
+            </div>
+          </div>
+
+          {activeTab === "progress" ? (
+            <div className="space-y-4">
+              {/* First Course with Upload */}
+              <div className="border p-4 rounded">
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-semibold">NAME OF THE COURSE</p>
+                    <p className="text-sm text-gray-600">LINK TO COURSE PLATFORM</p>
+                  </div>
+                  <button className="text-xl">▾</button>
+                </div>
+                <div className="bg-gray-200 h-32 flex items-center justify-center rounded mb-2">
+                  <span className="text-sm">UPLOAD DIPLOMA</span>
+                </div>
+                <button className="w-full bg-gray-400 text-white py-2 rounded">SEND PROGRESS</button>
+              </div>
+              {/* Other Courses */}
+              {courses.map((course, i) => (
+                <div key={course.id} className="border p-4 rounded">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="font-semibold">NAME OF THE COURSE</p>
+                      <p className="text-sm text-gray-600">LINK TO COURSE PLATFORM</p>
+                    </div>
+                    <button
+                      className="text-xl"
+                      onClick={() => {
+                        const updated = [...courses];
+                        updated[i].expanded = !updated[i].expanded;
+                        setCourses(updated);
+                      }}
+                    >
+                      {course.expanded ? "▴" : "▾"}
+                    </button>
+                  </div>
+                  {course.expanded && i === 0 && (
+                    <>
+                      <div className="bg-gray-200 h-32 flex items-center justify-center rounded mb-2">
+                        <span className="text-sm">UPLOAD DIPLOMA</span>
+                      </div>
+                      <button className="w-full bg-gray-400 text-white py-2 rounded">SEND PROGRESS</button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {courses.map((_, i) => (
+                <div key={i} className="border p-4 rounded">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="font-semibold">NAME OF THE COURSE</p>
+                      <p className="text-sm text-gray-600">LINK TO COURSE PLATFORM</p>
+                      <p className="text-sm text-gray-600">DATE OF SUBMISSION</p>
+                    </div>
+                    <button className="text-xl">⬇️</button>
+                  </div>
+                  <button className="w-full bg-black text-white py-2 rounded">STATUS OF REVIEW</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );
