@@ -1,46 +1,68 @@
 const express = require("express");
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
 
-const SECRET_KEY = process.env.JWT_SECRET || "supersecretkey";
-
-//  Registration
+// Register a new user
 router.post("/register", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: "Fill in all fields" });
+  const { id, email, password, role, studies } = req.body;
+
+  if (!id || !email || !password || !role) {
+    return res.status(400).json({ error: "Fill in all required fields (id, email, password, role)" });
+  }
 
   try {
+    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const result = await pool.query(
-      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
-      [username, hashedPassword]
+      `INSERT INTO "User" (id, email, passwordhash, role, studies) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING id, email, role, studies`,
+      [id, email, hashedPassword, role, studies || null]
     );
 
-    res.json({ user: result.rows[0] });
+    res.status(201).json({ user: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: "Registration error" });
+    console.error(err);
+    res.status(500).json({ error: "Error registering user" });
   }
 });
 
-//  Login
+// User login
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: "Fill in all fields" });
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Enter email and password" });
+  }
 
   try {
-    const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
-    if (result.rows.length === 0) return res.status(401).json({ error: "Invalid credentials" });
+    const result = await pool.query(`SELECT * FROM "User" WHERE email = $1`, [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid login credentials" });
+    }
 
     const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: "1h" });
+    // Compare the password with the hash from the database
+    const valid = await bcrypt.compare(password, user.passwordhash);
 
-    res.json({ token });
+    if (!valid) {
+      return res.status(401).json({ error: "Invalid login credentials" });
+    }
+
+    res.status(200).json({
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        studies: user.studies,
+      },
+      message: "Login successful",
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Login error" });
   }
 });

@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
+
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -20,6 +22,8 @@ export default function Login() {
 
   const emailRegex = /^[a-zA-Z]+(\.[a-zA-Z0-9]+)?@(live\.)?u-tad\.com$/;
 
+  const router = useRouter();
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -34,20 +38,36 @@ export default function Login() {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const newErrors = {
-      email: !emailRegex.test(formData.email),
-      password: formData.password.length < 8,
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+    
+      const newErrors = {
+        email: !emailRegex.test(formData.email),
+        password: formData.password.length < 8,
+      };
+    
+      setErrors(newErrors);
+    
+      if (!newErrors.email && !newErrors.password) {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+    
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Login failed");
+        } else {
+          alert("Login successful");
+          console.log("User Data:", data.user);
+    
+          router.push("/app/dashboard");
+        }
+      }
     };
-
-    setErrors(newErrors);
-
-    if (!newErrors.email && !newErrors.password) {
-      console.log("Form Submitted:", formData);
-    }
-  };
+  
+    
 
   return (
     <div className="flex h-screen">
