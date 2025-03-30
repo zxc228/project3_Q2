@@ -6,6 +6,7 @@ const router = express.Router();
 // Register a new user
 router.post("/register", async (req, res) => {
   const { id, email, password, role, studies } = req.body;
+  
 
   if (!id || !email || !password || !role) {
     return res.status(400).json({ error: "Fill in all required fields (id, email, password, role)" });

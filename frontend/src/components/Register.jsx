@@ -37,32 +37,42 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.selectedRole) {
       alert("Please select a role (Student or Teacher)");
       return;
     }
-
+  
     const emailError =
       formData.selectedRole === "student"
         ? !studentEmailRegex.test(formData.email)
         : !professorEmailRegex.test(formData.email);
-
+  
     const newErrors = {
       email: emailError,
       password: !passwordRegex.test(formData.password),
       confirmPassword: formData.password !== formData.confirmPassword,
     };
-
+  
     setErrors(newErrors);
-
+  
     if (!Object.values(newErrors).includes(true)) {
+      const payload = {
+        id: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.selectedRole?.toUpperCase(),
+        studies: formData.studies,
+      };
+  
+      
+  
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
-      console.log("Data being sent:", formData);
+  
       const data = await res.json();
       if (!res.ok) {
         alert(data.error || "Registration failed");
