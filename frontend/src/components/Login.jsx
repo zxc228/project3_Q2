@@ -1,11 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
+import Explanation from "./Explanation";
 
 export default function Login() {
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,23 +26,18 @@ export default function Login() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const emailRegex = /^[a-zA-Z]+(\.[a-zA-Z0-9]+)?@(live\.)?u-tad\.com$/;
+  const emailRegex = /^[a-zA-Z]+\.[a-zA-Z]+\d?@(live\.)?u-tad\.com$/;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
-    setErrors({
-      ...errors,
-      [name]: name === "email" ? !emailRegex.test(value) : value.length < 8,
-    });
   };
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {
@@ -45,7 +48,20 @@ export default function Login() {
     setErrors(newErrors);
 
     if (!newErrors.email && !newErrors.password) {
-      console.log("Form Submitted:", formData);
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+      } else {
+        alert("Login successful");
+        console.log("User Data:", data.user);
+        router.push("/app/dashboard");
+      }
     }
   };
 
@@ -57,19 +73,53 @@ export default function Login() {
           alt="U-Tad Logo"
           width={700}
           height={600}
-          className="max-h-full object-contain"
+          priority={true}
+          className="max-h-full object-contain w-full"
         />
       </div>
 
       <div className="w-1/2 flex flex-col justify-center items-center bg-white px-16">
         <div className="text-center mb-16 mt-auto">
-          <p className="text-black font-montserrat font-bold text-[46px]">
-            Welcome to PCA
+          <p className="text-custom-black font-montserrat font-bold text-[46px]">
+            Welcome to U-PaFi{" "}
+            <button
+              className="inline-block"
+              onClick={openModal}
+              aria-label="Explanation"
+            >
+              <Image
+                src={"/explanation.png"}
+                alt="Explanation"
+                width={20}
+                height={20}
+              />
+            </button>
           </p>
-          <p className="text-black font-montserrat font-bold text-[20px] mt-1">
-            Please enter your details
+          <p className="text-custom-black font-montserrat font-bold text-[20px] mt-1">
+            please enter your details
           </p>
         </div>
+
+        <Explanation isOpen={isModalOpen} closeModal={closeModal}>
+          <h1 className="text-custom-black font-montserrat text-[20px] text-center">
+            What is U-TAD Path Finder (U-PaFi)?
+          </h1>
+          <p className="text-custom-black font-400 font-montserrat text-[14px] mt-5 text-center">
+            Lorem ipsum dolor sit amet consectetur. Ut nec pretium feugiat
+            aliquet egestas. Ac sed ultricies purus dui feugiat tincidunt orci.
+            Sit dictumst lectus est lectus laoreet.
+          </p>
+
+          <div className="flex justify-center mt-4">
+            <Image
+              src="/explanation_image.png"
+              alt="Explanation Image"
+              width={400}
+              height={100}
+              className="object-contain"
+            />
+          </div>
+        </Explanation>
 
         <div className="w-full">
           <form onSubmit={handleSubmit}>
@@ -84,19 +134,19 @@ export default function Login() {
                 id="email"
                 type="email"
                 name="email"
+                autoComplete="email"
+                placeholder="Enter your U-Tad email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full border-b-4 py-2 font-montserrat text-[16px] ${
-                  errors.email
-                    ? "border-red-500 text-red-500"
-                    : "border-custom-utad-logo text-custom-utad-logo"
-                }`}
+                className="w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  Invalid email format
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
+                  errors.email ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                *the email is incorrect*
+              </p>
             </div>
 
             <div className="relative mb-6">
@@ -110,26 +160,26 @@ export default function Login() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 name="password"
+                autoComplete="current-password"
                 value={formData.password}
+                placeholder="Enter your password"
                 onChange={handleInputChange}
-                className={`w-full border-b-4 py-2 pr-10 font-montserrat text-[16px] ${
-                  errors.password
-                    ? "border-red-500 text-red-500"
-                    : "border-custom-utad-logo text-custom-utad-logo"
-                }`}
+                className="w-full border-b-4 py-2 px-3 pr-10 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <button
                 type="button"
                 onClick={handleShowPassword}
-                className="absolute right-2 top-10 text-black text-xl"
+                className="absolute right-2 top-10 text-black text-3xl"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  Password must be at least 8 characters
-                </p>
-              )}
+              <p
+                className={`text-red-500 text-sm mt-1 transition-opacity duration-300 ${
+                  errors.password ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                *the password is incorrect*
+              </p>
             </div>
 
             <div className="flex justify-center m-10">
@@ -144,8 +194,11 @@ export default function Login() {
           </form>
         </div>
 
-        <div className="mt-auto pb-10">
-          <p className="text-custom-utad-logo font-montserrat font-bold text-[24px]">
+        <div className="mt-auto pb-10 text-center">
+          <p className="text-custom-dark-grey font-montserrat font-bold text-[24px]">
+            <Link href="/app/forgot-password">forgot password?</Link>
+          </p>
+          <p className="text-custom-dark-grey font-montserrat font-bold text-[24px]">
             <Link href="/app/register">
               don’t have an account already?{" "}
               <span className="font-[800]">Sign up</span>

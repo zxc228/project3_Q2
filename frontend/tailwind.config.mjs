@@ -8,18 +8,15 @@ const config = {
   theme: {
     extend: {
       colors: {
-        "custom-yellow": "#FFF4C0",
-        "custom-orange": "#FFD0A8",
-        "custom-red": "#FFA4A4",
-        "custom-violet": "#CCC5FF",
-        "custom-blue": "#A2EBFC",
-        "custom-green": "#A2F9BC",
-        "custom-utad-logo": "#0E50FC",
+        "custom-black": "#14192C",
+        "custom-dark-grey": "#383B42",
+        "custom-utad-logo": "#0065EF",
       },
       fontFamily: {
         montserrat: ["Montserrat", "sans-serif"],
       },
       fontWeight: {
+        400: "400",
         700: "700",
         800: "800",
       },
