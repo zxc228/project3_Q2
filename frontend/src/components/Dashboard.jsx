@@ -2,10 +2,18 @@
 import React from "react";
 import { useState } from "react";
 
+import { useRouter } from 'next/navigation';
+
 const Dashboard = () => {
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("progress");
+
+  const router = useRouter(); 
+
+  const handleClick = () => {
+    router.push('/app/main-self-assesment');
+  };
 
   const careerTracks = ["I DON'T KNOW WHERE I WANT TO", "DATA", "WEB DEVELOPMENT", "CYBERSECURITY", "AI & MACHINE LEARNING"];
   const skills = [
@@ -48,7 +56,7 @@ const Dashboard = () => {
          <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold text-lg">Self-Assessment</h2>
-            <button className="border px-4 py-2 rounded">Complete Self-Assessment</button>
+            <button className="border px-4 py-2 rounded" onClick={handleClick}>Complete Self-Assessment</button>
           </div>
           <div className='mt-4'>
             <div className='bg-gray-200 p-4 rounded mb-2 flex justify-between items-center'>
