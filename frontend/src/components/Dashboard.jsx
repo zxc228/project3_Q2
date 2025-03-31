@@ -3,17 +3,21 @@ import React from "react";
 import { useState } from "react";
 
 const Dashboard = () => {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("progress");
 
-  const careerTracks = ["DATA ANALYST", "FRONTEND DEV", "BACKEND DEV"];
+  const careerTracks = ["I DON'T KNOW WHERE I WANT TO", "DATA", "WEB DEVELOPMENT", "CYBERSECURITY", "AI & MACHINE LEARNING"];
   const skills = [
-    { name: "Data Mining", current: 5 },
-    { name: "Data Visualization", current: 4 },
-    { name: "Data Cleaning", current: 3.5 },
-    { name: "Python", current: 3 },
+    { name: "Data Mining", current: 5, desired: 5 },
+    { name: "Data Visualization", current: 4, desired: 5 },
+    { name: "Data Cleaning", current: 3.5, desired: 2 },
+    { name: "Python", current: 3, desired: 3 },
+    { name: "SQL", current: 3.5, desired: 4 },
+    { name: "Big Data Processing Framework", current: 2, desired: 2 },
+    { name: "Tableau", current: 3, desired: 3.5 },
+    { name: "Machine Learning", current: 3, desired: 5 },
+    { name: "Matlab", current: 2, desired: 3 },
   ];
 
   const [courses, setCourses] = useState([
@@ -40,18 +44,6 @@ const Dashboard = () => {
 
       {/* Main content */}
       <main className="flex-1 p-6 relative">
-        {/* Top bar */}
-        <div className="flex justify-end items-center gap-4 mb-6">
-          <button onClick={() => setNotificationsOpen(!notificationsOpen)} className="relative">
-            <span className="material-icons text-3xl">🔔</span>
-            {notificationsOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border rounded shadow p-4">
-                <p>No Notifications</p>
-              </div>
-            )}
-          </button>
-        </div>
-
          {/* Self Assessment placeholder */}
          <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
@@ -62,21 +54,21 @@ const Dashboard = () => {
             <div className='bg-gray-200 p-4 rounded mb-2 flex justify-between items-center'>
               <div>
                 <p className='font-semibold'>Self-Assessment Results</p>
-                <p className='text-sm text-gray-600'>Date completed: 05/03/2025</p>
+                <p className='text-sm text-gray-600'>Date completed: 31/03/2025</p>
               </div>
               <div className='flex gap-2'>
-                <span className='material-icons'>👁️</span>
-                <span className='material-icons'>⬇️</span>
+                <button><span className='material-icons'>👁️</span></button>
+                <button><span className='material-icons'>⬇️</span></button>
               </div>
             </div>
             <div className='bg-gray-200 p-4 rounded mb-4 flex justify-between items-center'>
               <div>
                 <p className='font-semibold'>Self-Assessment Results</p>
-                <p className='text-sm text-gray-600'>Date completed: 04/01/2025</p>
+                <p className='text-sm text-gray-600'>Date completed: 28/03/2025</p>
               </div>
               <div className='flex gap-2'>
-                <span className='material-icons'>👁️</span>
-                <span className='material-icons'>⬇️</span>
+                <button><span className='material-icons'>👁️</span></button>
+                <button><span className='material-icons'>⬇️</span></button>
               </div>
             </div>
             <button className='mx-auto block border px-4 py-2 rounded bg-white'>See More</button>
@@ -100,6 +92,7 @@ const Dashboard = () => {
             </h2>
             <button className="border px-4 py-2 rounded">Generate PDF</button>
           </div>
+          <p className="text-sm text-gray-600 mb-4">You have an 80% for this career</p>
           <div>
             <h3 className="font-semibold mb-2">Skills</h3>
             <ul className="space-y-3">
@@ -112,12 +105,13 @@ const Dashboard = () => {
                       style={{ width: `${(skill.current / 5) * 100}%` }}
                     ></div>
                   </div>
-                  <span>{skill.current}</span>
+                  <span className="text-sm text-gray-600 mb-4">{skill.current} | {skill.desired}</span>
                 </li>
               ))}
             </ul>
           </div>
         </section>
+        
 
         {/* Personal Progress Section */}
         <section className={`bg-white p-6 shadow rounded transition-all ${isExpanded ? "fixed inset-0 z-50 overflow-y-auto" : "mb-6"}`}>
