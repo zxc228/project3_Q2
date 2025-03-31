@@ -168,10 +168,10 @@ export default function Register() {
     }`}
               >
                 <option value="">Select your studies</option>
-                <option value="B.S. COMPUTER SCIENCE - DATA ENGINEERING">
+                <option value="deg_data">
                   B.S. COMPUTER SCIENCE - DATA ENGINEERING
                 </option>
-                <option value="B.S. COMPUTER SCIENCE - CYBERSECURITY">
+                <option value="deg_cyber">
                   B.S. COMPUTER SCIENCE - CYBERSECURITY
                 </option>
               </select>
