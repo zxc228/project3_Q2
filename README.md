@@ -3,4 +3,4 @@
 ## Backend is in backend directory
 
 # Very important rule
-Do not use main branch for coding. Create your own branches and push them to this respository and Ilya will merge everything!
+Do not use main branch for coding. Create your own branches and push them to this respository and Ilya or Juanma will merge everything!

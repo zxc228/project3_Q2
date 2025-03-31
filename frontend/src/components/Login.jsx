@@ -60,7 +60,7 @@ export default function Login() {
       } else {
         alert("Login successful");
         console.log("User Data:", data.user);
-        router.push("/app/dashboard");
+        router.push("/dashboard");
       }
     }
   };
@@ -196,10 +196,10 @@ export default function Login() {
 
         <div className="mt-auto pb-10 text-center">
           <p className="text-custom-dark-grey font-montserrat font-bold text-[24px]">
-            <Link href="/app/forgot-password">forgot password?</Link>
+            <Link href="/forgot-password">forgot password?</Link>
           </p>
           <p className="text-custom-dark-grey font-montserrat font-bold text-[24px]">
-            <Link href="/app/register">
+            <Link href="/register">
               don’t have an account already?{" "}
               <span className="font-[800]">Sign up</span>
             </Link>
