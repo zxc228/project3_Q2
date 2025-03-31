@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SkillJustificationsPage() {
   const router = useRouter();
@@ -9,9 +9,9 @@ export default function SkillJustificationsPage() {
   const [submitted, setSubmitted] = useState([]);
   const [justifications, setJustifications] = useState([
     {
-      title: '',
-      url: '',
-      description: '',
+      title: "",
+      url: "",
+      description: "",
       file: null,
       expanded: true,
     },
@@ -39,9 +39,9 @@ export default function SkillJustificationsPage() {
     setJustifications([
       ...justifications,
       {
-        title: '',
-        url: '',
-        description: '',
+        title: "",
+        url: "",
+        description: "",
         file: null,
         expanded: true,
       },
@@ -58,18 +58,30 @@ export default function SkillJustificationsPage() {
           Add skill justifications
         </h2>
         <div className="flex items-center gap-4 text-2xl">
-        <button onClick={addJustification} className="text-blue-600 text-4xl hover:text-blue-800">
-        +</button>
+          <button
+            onClick={addJustification}
+            className="text-blue-600 text-4xl hover:text-blue-800"
+          >
+            +
+          </button>
 
           <button onClick={clearAll}>🗑</button>
-          <button onClick={() => alert('Exit clicked')} className="text-blue-600">✕</button>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="text-blue-600"
+          >
+            ✕
+          </button>
         </div>
       </div>
 
       {/* Justification Cards */}
       <div className="space-y-6">
         {justifications.map((item, index) => (
-          <div key={index} className="bg-white border-2 border-blue-500 rounded-lg p-4">
+          <div
+            key={index}
+            className="bg-white border-2 border-blue-500 rounded-lg p-4"
+          >
             {/* Card Header */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-4 flex-1">
@@ -94,7 +106,9 @@ export default function SkillJustificationsPage() {
                     type="text"
                     placeholder="NAME OF THE COURSE"
                     value={item.title}
-                    onChange={(e) => updateField(index, 'title', e.target.value)}
+                    onChange={(e) =>
+                      updateField(index, "title", e.target.value)
+                    }
                     className="w-full border-0 border-b-2 border-blue-600 text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none"
                   />
 
@@ -102,14 +116,16 @@ export default function SkillJustificationsPage() {
                     type="text"
                     placeholder="WEBSITE"
                     value={item.url}
-                    onChange={(e) => updateField(index, 'url', e.target.value)}
+                    onChange={(e) => updateField(index, "url", e.target.value)}
                     className="w-full border-0 border-b-2 border-blue-600 text-sm text-blue-600 font-semibold placeholder-gray-400 focus:outline-none"
                   />
 
                   <textarea
                     placeholder="Briefly describe the course and what you learnt!"
                     value={item.description}
-                    onChange={(e) => updateField(index, 'description', e.target.value)}
+                    onChange={(e) =>
+                      updateField(index, "description", e.target.value)
+                    }
                     className="w-full p-2 text-sm resize-none focus:outline-none"
                     rows={2}
                   />
@@ -121,7 +137,7 @@ export default function SkillJustificationsPage() {
                 onClick={() => toggleExpand(index)}
                 className="text-xl text-gray-600"
               >
-                {item.expanded ? '🔽' : '▶️'}
+                {item.expanded ? "🔽" : "▶️"}
               </button>
             </div>
 
@@ -140,7 +156,9 @@ export default function SkillJustificationsPage() {
                     alt="Upload icon"
                     className="w-12 h-12 mb-2 object-contain"
                   />
-                  <span className="uppercase tracking-wide text-sm">Upload Diploma</span>
+                  <span className="uppercase tracking-wide text-sm">
+                    Upload Diploma
+                  </span>
                 </label>
 
                 {/* Submit Button */}
@@ -198,7 +216,9 @@ export default function SkillJustificationsPage() {
 
               {/* Info */}
               <div className="flex-1 space-y-1">
-                <h3 className="font-bold text-sm uppercase text-gray-700">{item.title}</h3>
+                <h3 className="font-bold text-sm uppercase text-gray-700">
+                  {item.title}
+                </h3>
                 <a
                   href={item.url}
                   target="_blank"
@@ -221,13 +241,13 @@ export default function SkillJustificationsPage() {
       <div className="mt-10 flex justify-between">
         <button
           className="border-2 border-blue-600 text-blue-600 font-bold px-6 py-2 rounded-md"
-          onClick={() => router.push('/skill-rating')}
+          onClick={() => router.push("/skill-rating")}
         >
           RETURN
         </button>
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md"
-          onClick={() => router.push('/completion')}
+          onClick={() => router.push("/completion")}
         >
           NEXT
         </button>
