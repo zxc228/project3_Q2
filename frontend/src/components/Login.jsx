@@ -64,7 +64,7 @@ export default function Login() {
       <div className="w-1/2 flex flex-col justify-center items-center bg-white px-16">
         <div className="text-center mb-16 mt-auto">
           <p className="text-black font-montserrat font-bold text-[46px]">
-            Welcome to PCA
+          Welcome to UPaFi
           </p>
           <p className="text-black font-montserrat font-bold text-[20px] mt-1">
             Please enter your details

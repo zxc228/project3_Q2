@@ -19,10 +19,12 @@ const RegistrationPage = () => {
       </div>
       
 
-      {/* Right Section with the Form */}
-      <div className="w-1/2 p-8 flex flex-col justify-center">
-        <button className="text-xl">&#8592;</button>
-        <h1 className="text-4xl font-extrabold font-montserrat ml-60">Welcome to PCA</h1>
+      
+      <div className="w-1/2 p-8 flex flex-col">
+        <div>
+          <button className="text-xl">&#8592;</button>
+        </div>
+        <h1 className="text-4xl font-extrabold font-montserrat ml-60">Welcome to UPaFi</h1>
         <p className="text-gray-500 mb-8 ml-72 font-montserrat">please enter your details</p>
 
         <div className="flex gap-4 mb-4">
