@@ -79,7 +79,7 @@ export default function Login() {
       </div>
 
       <div className="w-1/2 flex flex-col justify-center items-center bg-white px-16">
-        <div className="text-center mb-16 mt-auto">
+        <div className="text-center mt-auto mb-10">
           <p className="text-custom-black font-montserrat font-bold text-[46px]">
             Welcome to U-PaFi{" "}
             <button
@@ -123,13 +123,7 @@ export default function Login() {
 
         <div className="w-full">
           <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label
-                htmlFor="email"
-                className="block text-black font-montserrat font-bold text-[24px]"
-              >
-                Email
-              </label>
+            <div className="mt-10 relative">
               <input
                 id="email"
                 type="email"
@@ -138,7 +132,7 @@ export default function Login() {
                 placeholder="Enter your U-Tad email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full border-b-4 py-2 px-3 font-montserrat text-[22px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <p
                 className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
@@ -149,13 +143,7 @@ export default function Login() {
               </p>
             </div>
 
-            <div className="relative mb-6">
-              <label
-                htmlFor="password"
-                className="block text-black font-montserrat font-bold text-[24px]"
-              >
-                Password
-              </label>
+            <div className="mt-10 relative">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -164,17 +152,17 @@ export default function Login() {
                 value={formData.password}
                 placeholder="Enter your password"
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 pr-10 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full border-b-4 py-2 px-3 pr-10 font-montserrat text-[22px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <button
                 type="button"
                 onClick={handleShowPassword}
-                className="absolute right-2 top-10 text-black text-3xl"
+                className="absolute right-2 top-2 text-black text-3xl"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
               <p
-                className={`text-red-500 text-sm mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
                   errors.password ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -182,7 +170,7 @@ export default function Login() {
               </p>
             </div>
 
-            <div className="flex justify-center m-10">
+            <div className="flex justify-center mt-10">
               <button
                 type="submit"
                 className="w-[235px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[24px] rounded-md text-center flex justify-center items-center"

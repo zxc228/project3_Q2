@@ -95,12 +95,12 @@ export default function Register() {
       </div>
       <div className="w-1/2 flex flex-col justify-center items-center pb-5">
         <div className="justify-self-start w-full pl-10">
-          <Link href="/app/login" className="text-black text-5xl">
+          <Link href="/" className="text-black text-5xl">
             &#8592;
           </Link>
         </div>
         <div className="text-center mb-6">
-          <h1 className="text-[32px] font-700 font-montserrat">
+          <h1 className="text-[32px] font-900 font-montserrat">
             Create new profile
           </h1>
         </div>
@@ -131,12 +131,6 @@ export default function Register() {
               </button>
             </div>
             <div className="relative mt-5">
-              <label
-                htmlFor="name"
-                className="block text-black font-montserrat font-bold text-[20px]"
-              >
-                Name
-              </label>
               <input
                 id="name"
                 name="name"
@@ -144,11 +138,11 @@ export default function Register() {
                 value={formData.name}
                 placeholder="Enter your name"
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[16px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <label
                 htmlFor="studies"
-                className="block text-black font-montserrat font-bold text-[20px] mt-5"
+                className="block text-black font-montserrat text-[24px] mt-10"
               >
                 Studies
               </label>
@@ -157,7 +151,7 @@ export default function Register() {
                 value={formData.studies}
                 onChange={handleInputChange}
                 disabled={formData.selectedRole === "teacher"}
-                className={`w-full border-2 px-3 py-2 mt-2 font-montserrat text-[16px] 
+                className={`w-full border-2 px-3 py-2 mt-5 font-montserrat text-[16px] 
     focus:outline-none rounded-md border-custom-utad-logo text-black
     ${
       formData.selectedRole === "teacher"
@@ -173,12 +167,6 @@ export default function Register() {
                   B.S. COMPUTER SCIENCE - CYBERSECURITY
                 </option>
               </select>
-              <label
-                htmlFor="email"
-                className="block text-black font-montserrat font-bold text-[20px] mt-5"
-              >
-                Email
-              </label>
               <input
                 id="email"
                 type="email"
@@ -187,22 +175,15 @@ export default function Register() {
                 placeholder="Enter your U-Tad email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[16px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full mt-10 border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               ></input>
               <p
-                className={`text-red-500 text-[14px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
                   errors.email ? "opacity-100" : "opacity-0"
                 }`}
               >
                 *use an email given by university*
               </p>
-
-              <label
-                htmlFor="password"
-                className="block text-black font-montserrat font-bold text-[20px] mt-5"
-              >
-                Password
-              </label>
               <input
                 id="password"
                 type="password"
@@ -211,23 +192,16 @@ export default function Register() {
                 value={formData.password}
                 placeholder="Enter your password"
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[16px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full mt-5 border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <p
-                className={`text-red-500 text-[14px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
                   errors.password ? "opacity-100" : "opacity-0"
                 }`}
               >
                 *must be 7 characters long and not include any special
                 characters*
               </p>
-
-              <label
-                htmlFor="confirmPassword"
-                className="block text-black font-montserrat font-bold text-[20px] mt-5"
-              >
-                Confirm Password
-              </label>
               <input
                 id="confirmPassword"
                 type="password"
@@ -236,27 +210,29 @@ export default function Register() {
                 value={formData.confirmPassword}
                 placeholder="Confirm your password"
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[16px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full mt-5 border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <p
-                className={`text-red-500 text-[14px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
                   errors.confirmPassword ? "opacity-100" : "opacity-0"
                 }`}
               >
                 *the passwords do not match*
               </p>
 
-              <button
-                type="submit"
-                className="w-full bg-custom-utad-logo text-white font-montserrat font-bold text-[20px] py-2 mt-5 rounded"
-              >
-                CREATE ACCOUNT
-              </button>
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="w-1/2 bg-custom-utad-logo text-white font-montserrat font-bold text-[21px] py-2 mt-10 rounded-lg"
+                >
+                  CREATE ACCOUNT
+                </button>
+              </div>
             </div>
           </form>
 
           <div className="text-center mt-10">
-            <p className="text-[16px]">
+            <p className="text-[22px]">
               A confirmation code will be sent to your email
             </p>
           </div>
