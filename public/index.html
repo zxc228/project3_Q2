@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
+    <title>U-Tad Career Coach</title>
     <link rel="stylesheet" href="/styles.css">
     <script type="importmap">
       {
@@ -15,7 +15,6 @@
     </script>
 </head>
 <body>
-    <script type="module" src="/main.js"></script>
     <header id="header">U-TAD CAREER COACH!</header>
     <form id="uploadForm">
         <label> Your CV (in docx or PDF)</label>
@@ -25,6 +24,7 @@
         <button type="submit">Upload</button>
     </form>
 
+    <script type="module" src="/main.js"></script>
     <script>
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -34,7 +34,6 @@
             fd.append('email', document.getElementById('email').value);
 
             //const res = await fetch('http://127.0.0.1:3000/api/cv', { method: 'POST', body: fd })
-            //const res = await fetch('https://e166-212-0-109-168.ngrok-free.app/api/file', {method: 'POST', body: fd})
             const res = await fetch('http://138.68.126.118:3000/api/cv', { method: 'POST', body: fd })
             console.log(res.status)
         })

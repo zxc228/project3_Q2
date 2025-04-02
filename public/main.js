@@ -183,7 +183,6 @@ async function main() {
         rotate(pc, -0.001, 0.001, 0.002)
         rotate(calc, 0.001, 0.002, -0.001)
         rotate(mouse, -0.003, 0.0015, -0.0015)
-
         rotate(pokeball, 0.2, 0, 0)
         move(pokeball, -0.001, 0.002, 0.02)
 

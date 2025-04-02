@@ -1,0 +1,34 @@
+import express from 'express'
+import multer from 'multer'
+import cors from 'cors'
+import { join } from 'path'
+import { mimes, __dirname } from './constants.js'
+import processPostRequest from './post_request.js'
+
+const PUBLIC_PATH = join(__dirname, '/../public')
+const PORT = 3000
+const upload = multer({ dest: join(__dirname, '/../uploads') })
+const app = express()
+
+app.use(express.json())
+app.use(cors())
+app.use(express.static(PUBLIC_PATH))
+
+app.listen(PORT, '0.0.0.0', () => { console.log(`Server up and running on port ${PORT}`) })
+app.get(['/', '/index.html'], (_, res) => { res.sendFile(join(PUBLIC_PATH, 'index.html')) }) 
+
+
+app.post('/api/cv', upload.single('file'), async (req, res) => {
+    const mimetype = req.file.mimetype
+    const path = '../uploads/' + req.file.filename
+
+    if (req.file.size > 5000000) 
+        res.status(413).send(`${req.file.originalname} is larger than 5MB max size`)
+    else if (!Object.values(mimes).includes(mimetype)) 
+        res.status(415).send(`${mimetype} not supported (please give .pdf or .docx`)
+    else { 
+        res.status(201).send()
+        await processPostRequest(path, mimetype, req)
+    }
+})
+
