@@ -1,3 +1,18 @@
+const phoneNumRe = /(?:\+\d{1,3}[\s-]?)?(?:\d{2,4}[\s-]?){2,5}\d{2,4}/g
+const emailRe = /([a-zA-Z0-9._%+-]+)(?=@[a-zA-Z0-9.-]+\.[a-zA-Z]+)/g
+const githubRe = /(?<=github\.com\/)[a-zA-Z0-9_-]+/g
+const linkedinRe = /(?<=linkedin\.com\/(?:in|company)\/)[a-zA-Z0-9_-]+/g
+
+const removeMarkdown = (text) => text.replace("```markdown", '').replace("```", '')
+const removePersonalInfo = (cv) => {
+    return cv
+        .replace(phoneNumRe, m => '*'.repeat(m.length))
+        .replace(emailRe, m => '*'.repeat(m.length))
+        .replace(githubRe, m => '*'.repeat(m.length))
+        .replace(linkedinRe, m => '*'.repeat(m.length))
+}
+
+
 const mimes = {
     'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'pdf': 'application/pdf'
@@ -61,6 +76,7 @@ const advicePrompt = (cvSummary) => {
     `
 }
 
+
 /*
 const summaryPrompt = (cv) => {
     return `Generate a very concise and structured summary of this CV: ${cv}. 
@@ -96,4 +112,12 @@ const advicePrompt = (cvSummary) => {
 
 
 
-module.exports = { mimes, roles, removeInfoPrompt, summaryPrompt, advicePrompt }
+module.exports = { 
+    mimes, 
+    roles, 
+    removeInfoPrompt, 
+    summaryPrompt, 
+    advicePrompt, 
+    removePersonalInfo,
+    removeMarkdown
+}

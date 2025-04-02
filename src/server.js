@@ -5,12 +5,18 @@ const { Converter } = require('showdown') // converts md to HTML and vice versa
 const { join } = require('path')
 const { unlink } = require('fs/promises')
 const { existsSync } = require('fs')
+
 const { Textract } = require('./textract')
-const { Lima } = require('./lima')
 const { QuExecutor } = require('./quexecutor')
 const { Mail } = require('./mail')
 const { DeepSeek, Models } = require('./deepseek')
-const { mimes, summaryPrompt, advicePrompt, removeInfoPrompt } = require('./constants')
+const { 
+    mimes, 
+    summaryPrompt, 
+    advicePrompt, 
+    removePersonalInfo, 
+    removeMarkdown 
+} = require('./constants')
 
 const UPLOADS_PATH = join(__dirname, '/../uploads')
 const PUBLIC_PATH = join(__dirname, '/../public')
@@ -24,13 +30,13 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static(PUBLIC_PATH))
 
-app.listen(PORT, () => { console.log(`Server up and running on port ${PORT}`) })
+app.listen(PORT, '0.0.0.0', () => { console.log(`Server up and running on port ${PORT}`) })
 app.get(['/', '/index.html'], (_, res) => { res.sendFile(INDEX_PATH) }) 
 
+
 const queueJob = async (cv) => {
-    //  TODO instead of using llm, use regex to mask phone numbers, emails and websites (to not give personal info to deepseek)
-    const cvClean = await Lima.chat(removeInfoPrompt(cv)).then(r => Lima.filterThinking(r.response))
-    const summary = await ds.completion(summaryPrompt(cvClean)).then(r => r.choices[0].message.content)
+    const cvClean = removePersonalInfo(cv)
+    const summary = await ds.completion(summaryPrompt(cvClean)).then(r => r.choices[0].message.content).then(r => removeMarkdown(r))
     const advice = await ds.completion(advicePrompt(summary)).then(r => r.choices[0].message.content)
     return summary + '\n\n---\n\n' + advice
 }
