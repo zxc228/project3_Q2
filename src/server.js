@@ -48,7 +48,7 @@ const mdToHtml = new Converter()
 
 // TODO: modify request to take a website (Textract.web(url) already implemented)
 // TODO: do not download files, have them in memory
-app.post('/api/file', upload.single('file'), async (req, res) => {
+app.post('/api/cv', upload.single('file'), async (req, res) => {
     const mimetype = req.file.mimetype
     const path = '../uploads/' + req.file.filename
 
@@ -60,7 +60,7 @@ app.post('/api/file', upload.single('file'), async (req, res) => {
         res.status(201).send()
         await doTheThing(path, mimetype, req)
     }
-    await unlink(join(__dirname, path)).catch(e => console.error(e.message))
+    //await unlink(join(__dirname, path)).catch(e => console.error(e.message))
 })
 
 
@@ -76,6 +76,8 @@ async function doTheThing(path, mimetype, req) {
 
         await Mail.send(req.body.email, response)
         console.log('Sending email => Done')
+
+        await unlink(join(__dirname, path)).catch(e => console.error(e.message))
     } catch (e) {
         console.error(e.message)
     }
