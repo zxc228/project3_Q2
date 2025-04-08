@@ -7,6 +7,7 @@ import processPostRequest from './post_request.js'
 
 const PUBLIC_PATH = join(__dirname, '/../public')
 const PORT = 3000
+
 const upload = multer({ dest: join(__dirname, '/../uploads') })
 const app = express()
 
@@ -14,9 +15,14 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static(PUBLIC_PATH))
 
-app.listen(PORT, '0.0.0.0', () => { console.log(`Server up and running on port ${PORT}`) })
-app.get(['/', '/index.html'], (_, res) => { res.sendFile(join(PUBLIC_PATH, 'index.html')) }) 
 
+app.listen(PORT, '0.0.0.0', () => { 
+    console.log(`Server up and running on port ${PORT}`) 
+})
+
+app.get(['/', '/index.html'], (_, res) => { 
+    res.sendFile(join(PUBLIC_PATH, 'index.html')) 
+}) 
 
 app.post('/api/cv', upload.single('file'), async (req, res) => {
     const mimetype = req.file.mimetype

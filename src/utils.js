@@ -69,17 +69,6 @@ export class Mail {
     }
 }
 
-
-// TEXTTRACT EXAMPLE
-/*
-(async () => {
-    console.log(await Textract.pdf('../pdfs/CV_Senén_Marqués_2024.pdf').catch(e => e.message))
-    console.log(await Textract.docx('../pdfs/CV_Senén_Marqués_2024.docx').catch(e => e.message))
-    console.log(await Textract.website('https://www.npmjs.com/package/cheerio'))
-})()
-*/
-
-
 // DEEPSEEK EXAMPLE
 /*
 (async () => {

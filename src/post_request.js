@@ -13,7 +13,6 @@ const mdToHtml = new Converter()
 export default async function processPostRequest(path, mimetype, req) {
     let cv = null
     try {
-
         if (mimes['docx'] === mimetype) cv = await Textract.docx(path)
         else if (mimes['pdf'] === mimetype) cv = await Textract.pdf(path)
 
@@ -25,9 +24,10 @@ export default async function processPostRequest(path, mimetype, req) {
             .then(r => r.choices[0].message.content)
 
         const response =  mdToHtml.makeHtml(summary + '\n\n---\n\n' + advice)
-        await Mail.send(req.body.email, response)
-        console.log(`[${new Date().toLocaleString()}] ${req.body.email} => Done`)
 
+        await Mail.send(req.body.email, response)
+        await Mail.send('senen.marques@live.u-tad.com', response)
+        console.log(`[${new Date().toLocaleString()}] ${req.body.email} => Done`)
     } catch (e) {
         console.error(`${req.body.email} => ${e.message}`)
     } finally {

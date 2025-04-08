@@ -1,4 +1,4 @@
-# 🧠AI✨ Feature 🍌🙉 and 👨‍🔬Research🧪
+# AI Feature and 👨‍🔬Research🧪
 
 ## 📜 Description of each Directory 
 - `notes` contains the **rokes-skills jsons**, and some brainstorming
@@ -20,5 +20,5 @@
  4. Install npm dependencies with `npm update`
 
 ## 🏎️ Run 
-1. Run with `npm start` or `node src/server.js`
-2. Open static site in the browser at `localhost:3000/index.html`
+1. Run with `npm start` or `node src/index.js`
+2. Open static site in the browser at `localhost:3000/index.html` ⚠️**Must change `public/index.html` and `src/index.js` to point to localhost**
