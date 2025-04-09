@@ -76,7 +76,7 @@ export default function Register() {
         alert(data.error || "Registration failed");
       } else {
         alert("Registration successful");
-        router.push("/login");
+        router.push("/");
       }
     }
   };
