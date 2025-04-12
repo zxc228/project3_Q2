@@ -99,7 +99,6 @@ export default function Login() {
             please enter your details
           </p>
         </div>
-
         <Explanation isOpen={isModalOpen} closeModal={closeModal}>
           <h1 className="text-custom-black font-montserrat text-[20px] text-center">
             What is U-TAD Path Finder (U-PaFi)?
