@@ -53,7 +53,7 @@
             event.preventDefault();
             const fd = new FormData()
             fd.append('expedienteFile', document.getElementById('expediente').files[0])
-            const res = await fetch('http://127.0.0.1:3000/api/expediente', { method: 'POST', body: fd })
+            const res = await fetch('http://138.68.118:3000/api/expediente', { method: 'POST', body: fd })
                 .then(r => r.json())
             console.log(res.status)
             console.log(res)   
