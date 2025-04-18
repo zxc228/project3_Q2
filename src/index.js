@@ -18,7 +18,7 @@ app.listen(3000, '0.0.0.0', () => { console.log(`Server up and running on port 3
 app.get(['/', '/index.html'], (_, res) => { res.sendFile(join(PUBLIC_PATH, 'index.html')) }) 
 
 
-app.post('/api/cv', upload.single('file'), async (req, res) => {
+app.post('/api/cv', upload.single('cv'), async (req, res) => {
     const mimetype = req.file.mimetype
     const email = req.body.email
     const path = join(projectRoot, 'uploads/' + req.file.filename)
@@ -34,7 +34,7 @@ app.post('/api/cv', upload.single('file'), async (req, res) => {
 })
 
 
-app.post('/api/expediente', upload.single('expedienteFile'), async (req, res) => {
+app.post('/api/expediente', upload.single('expediente'), async (req, res) => {
     const mimetype = req.file.mimetype
     const path = join(projectRoot, 'uploads/' + req.file.filename)
 

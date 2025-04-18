@@ -19,15 +19,15 @@
     <div id='formContainer'>
         <form id="cvForm">
             <label> Your CV (in docx or PDF)</label>
-            <label for="file" class="file-upload-button">Upload CV</label>
-            <input type="file" name="file" id="file" required>
+            <label for="cv" class="file-upload-button">Upload CV</label>
+            <input type="file" name="cv" id="cv" required>
             <input type="text" name="email" id="email" placeholder="Enter an email" required>
             <button type="submit">Upload</button>
         </form>
         <form id="expedienteForm">
             <label> Your Expediente Académico (in .html)</label>
             <label for="expediente" class="file-upload-button">Upload Expediente Académico</label>
-            <input type="file" name="expedienteFile" id="expediente" required>
+            <input type="file" name="expediente" id="expediente" required>
             <button type="submit">Upload</button>
         </form>
     </div>
@@ -36,14 +36,15 @@
         document.getElementById('cvForm').addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            const file = document.getElementById('file').files[0]
+            const file = document.getElementById('cv').files[0]
             const email = document.getElementById('email').value
             
             const fd = new FormData()
-            fd.append('file', file)
+            fd.append('cv', file)
             fd.append('email', email)
 
-            const res = await fetch('http://138.68.126.118:3000/api/cv', { method: 'POST', body: fd })
+            //const res = await fetch('http://138.68.126.118:3000/api/cv', { method: 'POST', body: fd })
+            const res = await fetch('http://127.0.0.1:3000/api/cv', { method: 'POST', body: fd })
 
             console.log(res.status)
             if (res.status === 201) alert(`CV sent to ${email}`)
@@ -52,7 +53,7 @@
         document.getElementById('expedienteForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const fd = new FormData()
-            fd.append('expedienteFile', document.getElementById('expediente').files[0])
+            fd.append('expediente', document.getElementById('expediente').files[0])
             const res = await fetch('http://138.68.126.118:3000/api/expediente', { method: 'POST', body: fd }).then(r => r.json())
             console.log(res)   
         })
