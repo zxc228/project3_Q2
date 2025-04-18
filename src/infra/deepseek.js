@@ -13,7 +13,7 @@ export default class DeepSeek {
         return await this.ai.chat.completions.create({
             model: this.model,
             messages: [{ 
-                role: this.model === Models.CHAT ? 'system' : 'user',
+                role: this.model === DeepSeek.Models.CHAT ? 'system' : 'user',
                 content: msg 
             }] 
         })

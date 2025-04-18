@@ -1,13 +1,12 @@
 import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-
-export const __dirname = dirname(fileURLToPath(import.meta.url)) // ESMODULE syntax is beautiful until you have to do this hack
+import { dirname, resolve } from 'path'
 
 const phoneNumRe = /(?:\+\d{1,3}[\s-]?)?(?:\d{2,4}[\s-]?){2,5}\d{2,4}/g
 const emailRe = /([a-zA-Z0-9._%+-]+)(?=@[a-zA-Z0-9.-]+\.[a-zA-Z]+)/g
 const githubRe = /(?<=github\.com\/)[a-zA-Z0-9_-]+/g
 const linkedinRe = /(?<=linkedin\.com\/(?:in|company)\/)[a-zA-Z0-9_-]+/g
 
+export const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 export const removeMarkdown = (text) => text.replace("```markdown", '').replace("```", '')
 export const removePersonalInfo = (cv) => {
     return cv
@@ -17,12 +16,10 @@ export const removePersonalInfo = (cv) => {
         .replace(linkedinRe, m => '*'.repeat(m.length))
 }
 
-
 export const mimes = {
     'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'pdf': 'application/pdf'
 }
-
 
 export const removeInfoPrompt = (cv) => {
     return `Remove any contact or personal information like phone numbers, emails, addresses and home addresses from this CV: ${cv}. Generate only the edited CV`

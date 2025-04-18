@@ -1,13 +1,12 @@
 import extract from 'pdf-text-extract'
 import mammoth from 'mammoth'
 import * as cheerio from 'cheerio' 
-import { __dirname } from '../index.js'
 
 
 export default class Textract {
-    static async pdf(relativePath) {
+    static async pdf(path) {
         return new Promise((resolve, reject) => {
-            extract(path.join(__dirname, relativePath), (err, pages) => {
+            extract(path, (err, pages) => {
                 if (err) {
                     reject(err)
                     return
@@ -22,7 +21,7 @@ export default class Textract {
         return $('body').text().trim()
     }
 
-    static async docx(relativePath) {
-        return await mammoth.extractRawText({ path: path.join(__dirname, relativePath) }).then(res => res.value)
+    static async docx(path) {
+        return await mammoth.extractRawText({ path: path }).then(res => res.value)
     }
 }

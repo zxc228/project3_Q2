@@ -31,7 +31,6 @@
             <button type="submit">Upload</button>
         </form>
     </div>
-
     <script type="module" src="/main.js"></script>
     <script>
         document.getElementById('cvForm').addEventListener('submit', async (event) => {
@@ -45,6 +44,7 @@
             fd.append('email', email)
 
             const res = await fetch('http://138.68.126.118:3000/api/cv', { method: 'POST', body: fd })
+
             console.log(res.status)
             if (res.status === 201) alert(`CV sent to ${email}`)
         })
@@ -53,9 +53,7 @@
             event.preventDefault();
             const fd = new FormData()
             fd.append('expedienteFile', document.getElementById('expediente').files[0])
-            const res = await fetch('http://138.68.118:3000/api/expediente', { method: 'POST', body: fd })
-                .then(r => r.json())
-            console.log(res.status)
+            const res = await fetch('http://138.68.126.118:3000/api/expediente', { method: 'POST', body: fd }).then(r => r.json())
             console.log(res)   
         })
     </script>
