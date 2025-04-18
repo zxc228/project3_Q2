@@ -1,14 +1,16 @@
 import express from 'express'
 import multer from 'multer'
 import cors from 'cors'
-import { join } from 'path'
-import { mimes, __dirname } from './constants.js'
-import processPostRequest from './post_request.js'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
+import { mimes } from './infra/constants.js'
+import processCV from './logic/cv.js'
+import processExpediente from './logic/expediente.js'
 
-const PUBLIC_PATH = join(__dirname, '/../public')
+export const __dirname = dirname(fileURLToPath(import.meta.url))
+const PUBLIC_PATH = join(__dirname, '../public')
 const PORT = 3000
-
-const upload = multer({ dest: join(__dirname, '/../uploads') })
+const upload = multer({ dest: join(__dirname, '../uploads') })
 const app = express()
 
 app.use(express.json())
@@ -34,7 +36,21 @@ app.post('/api/cv', upload.single('file'), async (req, res) => {
         res.status(415).send(`${mimetype} not supported (please give .pdf or .docx`)
     else { 
         res.status(201).send()
-        await processPostRequest(path, mimetype, req)
+        await processCV(path, mimetype, req)
+    }
+})
+
+app.post('/api/expediente', upload.single('expedienteFile'), async (req, res) => {
+    const mimetype = req.file.mimetype
+    const path = join(__dirname, '../uploads/' + req.file.filename)
+
+    if (req.file.size > 5000000)
+        res.status(413).send(`${req.file.originalname} is larger than 5MB max size`)
+    else if (mimetype != 'text/html')
+        res.status(415).send(`${mimetype} not supported (please give .html`)
+    else {
+        const subjects = await processExpediente(path)
+        res.status(201).json(subjects)
     }
 })
 

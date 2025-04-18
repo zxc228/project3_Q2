@@ -1,9 +1,6 @@
-/* TERRIBLE LLM GENERATED CSS */
 html, body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
     font-family: Arial, sans-serif;
 }
@@ -17,11 +14,9 @@ canvas {
     z-index: -1;
 }
 
-#header {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+header {
+    position: relative;
+    margin: 20px auto 40px auto;
     background: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 10px 20px;
@@ -29,56 +24,57 @@ canvas {
     border-radius: 5px;
     text-align: center;
     white-space: nowrap;
+    width: fit-content;
 }
 
-#uploadForm {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    transform: translate(-50%, -50%);
+#formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40vw;
+    gap: 2rem;
+}
+
+form {
     background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
+    padding: 0.5rem 1rem;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 90%;
+    width: 100%;
     max-width: 400px;
-    margin: 10px;
+    text-align: center;
 }
 
-#uploadForm label,
-#uploadForm input,
-#uploadForm button,
+form label,
+form input,
+form button,
 .file-upload-button {
     display: block;
     width: 100%;
     text-align: center;
     box-sizing: border-box;
+    margin: 0.5rem 0;
+}
+
+button, 
+.file-upload-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+
+button:hover, 
+.file-upload-button:hover {
+    background: #0056b3;
 }
 
 input[type="file"] {
     display: none;
     visibility: hidden;
-    height: 15px;
-}
-
-.file-upload-button {
-    padding: 10px;
-    background: #007bff;
-    color: white;
-    margin-top: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.file-upload-button:hover {
-    background: #0056b3;
-}
-
-.file-upload-button:active {
-    background: #00408d;
 }
 
 input[type="text"] {
@@ -86,35 +82,21 @@ input[type="text"] {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
-    margin-bottom: 10px;
 }
 
-button {
-    padding: 10px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-button:hover {
-    background: #0056b3;
-}
-
-@media (max-width: 768px) {
-    body {
-        display: flex;        
-        flex-direction: column; 
-        align-items: center;    
+@media (max-width: 1200px) {
+    #formContainer {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
         justify-content: center; 
+        width: 100%;
+        min-height: 100vh; 
     }
 
-    #uploadForm {
-        margin: auto;
-        transform: none;
-        top: auto;
-        left: auto;
+    form {
+        width: 80%; 
+        max-width: 400px; 
     }
 }
+
