@@ -16,7 +16,9 @@ const profileTutorRoutes = require('./profile-tutor-routes');
  */
 module.exports = function(app, services) {
   // public authentication routes (no auth required)
-  app.use('/api/auth', authRoutes(services));
+  app.use('/api/auth', authRoutes({ authService: services.authService }));
+
+
   
   // creating auth middleware with auth service
   const authenticate = authMiddleware(services.authService);

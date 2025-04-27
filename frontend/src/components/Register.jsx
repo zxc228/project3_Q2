@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-hot-toast';
+
 
 export default function Register() {
   const router = useRouter();
@@ -39,7 +41,7 @@ export default function Register() {
     e.preventDefault();
 
     if (!formData.selectedRole) {
-      alert("Please select a role (Student or Teacher)");
+      toast.error("Please select a role (Student or Teacher)");
       return;
     }
 
@@ -65,7 +67,7 @@ export default function Register() {
         studies: formData.studies,
       };
 
-      const res = await fetch("/api/register", {
+    const res = await fetch("/api/auth/register",{
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -73,9 +75,9 @@ export default function Register() {
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Registration failed");
+        toast.error(data.error || "Registration failed");
       } else {
-        alert("Registration successful");
+        toast.success("Registration successful");
         router.push("/");
       }
     }

@@ -28,7 +28,7 @@ class AuthService {
       // creating user with hashed password
       const user = await this.authDAO.createUser({
         ...userInfo,
-        passwordHash: hashedPassword
+        passwordhash: hashedPassword
       });
       
       // returning user without password hash
@@ -44,13 +44,13 @@ class AuthService {
   async authenticateUser(email, password) {
     try {
       // finding user by email
-      const user = await this.authDao.getUserByEmail(email);
+      const user = await this.authDAO.getUserByEmail(email);
       if (!user) {
         throw new Error('Invalid credentials');
       }
       
       // verifying password
-      const validPassword = await bcrypt.compare(password, user.passwordHash);
+      const validPassword = await bcrypt.compare(password, user.passwordhash);
       if (!validPassword) {
         throw new Error('Invalid credentials');
       }

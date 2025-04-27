@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 import Explanation from "./Explanation";
+import { toast } from 'react-hot-toast';
 
 export default function Login() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function Login() {
     setErrors(newErrors);
 
     if (!newErrors.email && !newErrors.password) {
-      const res = await fetch("/api/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -56,9 +57,9 @@ export default function Login() {
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Login failed");
+        toast.error(data.error || "Login failed");
       } else {
-        alert("Login successful");
+        toast.success("Login successful");
         console.log("User Data:", data.user);
         router.push("/dashboard");
       }

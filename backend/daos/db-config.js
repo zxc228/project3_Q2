@@ -1,9 +1,9 @@
 const dbConfig = {
   development: {
     user: 'postgres',
-    host: 'localhost',
+    host: '188.225.14.199',
     database: 'p3q2database',
-    password: 'PASSWORDGOESHERE', // I am definitely not including the actual password here, bc this file goes to the github, but on the server it will be defined here, which it not the best practice, but will work for our purposes
+    password: 'HSfdk9Rs', // I am definitely not including the actual password here, bc this file goes to the github, but on the server it will be defined here, which it not the best practice, but will work for our purposes
     port: 5432,
     ssl: false
   },
