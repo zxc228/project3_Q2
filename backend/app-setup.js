@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const { initializeDAOs } = require('./daos/dao-index');
-const { getDatabaseConfig } = require('./daos/db-config');
+const { initializeDAOs } = require('./DAOs/dao-index');
+const { getDatabaseConfig } = require('./DAOs/db-config');
 const { initializeServices } = require('./services/service-index');
 const registerRoutes = require('./routes/routes-index');
 

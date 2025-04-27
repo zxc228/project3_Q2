@@ -2,6 +2,11 @@ const profileRoutes = require('./profile-routes');
 const skillRoutes = require('./skill-routes');
 const careerRoutes = require('./career-routes');
 const reportRoutes = require('./report-routes');
+const authRoutes = require('./auth-routes');
+const authMiddleware = require('../config/auth-middleware');
+const tutorRoutes = require('./tutor-routes');
+const profileTutorRoutes = require('./profile-tutor-routes');
+
 
 /**
  * registering all API routes
@@ -10,14 +15,19 @@ const reportRoutes = require('./report-routes');
  * @param {Object} services - initialized services
  */
 module.exports = function(app, services) {
-  // applying authentication middleware if needed
-  // app.use('/api', authMiddleware);
+  // public authentication routes (no auth required)
+  app.use('/api/auth', authRoutes(services));
   
-  // registering route handlers
-  app.use('/api/profiles', profileRoutes(services));
-  app.use('/api/skills', skillRoutes(services));
-  app.use('/api/careers', careerRoutes(services));
-  app.use('/api/reports', reportRoutes(services));
+  // creating auth middleware with auth service
+  const authenticate = authMiddleware(services.authService);
+  
+  // applying authentication middleware to protected routes
+  app.use('/api/profiles', authenticate, profileRoutes(services));
+  app.use('/api/profiles', authenticate, profileTutorRoutes(services));
+  app.use('/api/skills', authenticate, skillRoutes(services));
+  app.use('/api/careers', authenticate, careerRoutes(services));
+  app.use('/api/reports', authenticate, reportRoutes(services));
+  app.use('/api/tutors', authenticate, tutorRoutes(services));
   
   // catchall route for 404 errors
   app.use('/api/*', (req, res) => {
@@ -36,3 +46,4 @@ module.exports = function(app, services) {
     });
   });
 };
+

@@ -1,43 +1,13 @@
-// this is the service for managing user (student) profiles and authentication
-// TODO revise and rewrite later!!!
+// this is the service for managing user (student) profiles
 class ProfileService {
   // creating a new profile service instance
-  constructor(userDAO, profileDAO, academicDAO) {
+  constructor(userDAO, profileDAO, academicDAO, tutorDAO) {
     this.userDAO = userDAO;
     this.profileDAO = profileDAO;
     this.academicDAO = academicDAO;
+    this.tutorDAO = tutorDAO;
   }
 
-  // authenticating a user by email and password
-  async authenticateUser(email, password) {
-    try {
-      // getting user by email
-      const user = await this.userDAO.getUserByEmail(email);
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      // verifying password (this is a simplified example)
-      if (user.passwordHash !== password) {
-        throw new Error('Invalid password');
-      }
-
-      // getting profile data
-      const profile = await this.profileDAO.getProfileByUserId(user.id);
-
-      return {
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role
-        },
-        profile
-      };
-    } catch (error) {
-      console.error('Authentication error:', error);
-      throw new Error('Authentication failed');
-    }
-  }
 
   // getting complete profile information + academic data
   async getCompleteProfile(profileId) {
@@ -66,6 +36,12 @@ class ProfileService {
       // getting grades for this profile
       const grades = await this.profileDAO.getStudentGrades(profileId);
 
+      // getting tutor information if assigned
+      let tutor = null;
+      if (profile.tutorId) {
+        tutor = await this.tutorDAO.getTutorById(profile.tutorId);
+      }
+
       return {
         profile,
         user: {
@@ -77,7 +53,12 @@ class ProfileService {
           degree,
           subjects,
           grades
-        }
+        },
+        tutor: tutor ? {
+          id: tutor.id,
+          firstName: tutor.firstName,
+          lastName: tutor.lastName
+        } : null
       };
     } catch (error) {
       console.error('Error getting complete profile:', error);

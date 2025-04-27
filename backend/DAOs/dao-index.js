@@ -5,6 +5,8 @@ const AcademicDAO = require('./academic-dao');
 const SkillsDAO = require('./skills-dao');
 const CareerDAO = require('./career-dao');
 const ReportDAO = require('./report-dao');
+const AuthDao = require('./auth-dao');
+const TutorDAO = require('./tutor-dao');
 
 // initializing database connection and DAOs
 function initializeDAOs(config) {
@@ -26,6 +28,8 @@ function initializeDAOs(config) {
     skillsDAO: new SkillsDAO(pool),
     careerDAO: new CareerDAO(pool),
     reportDAO: new ReportDAO(pool),
+    authDao: new AuthDao(pool),
+    tutorDAO: new TutorDAO(pool),
     
     // method to close all connections when shutting down
     closeConnections: async () => {
