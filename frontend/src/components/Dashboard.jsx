@@ -11,7 +11,7 @@ const Dashboard = () => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push("/main-self-assesment");
+    router.push("/assessment");
   };
 
   const careerTracks = [

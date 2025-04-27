@@ -124,6 +124,14 @@ class CareerRecommendationService {
       throw new Error('Failed to retrieve career types');
     }
   }
+  async getCareerSkillsByTypeId(careerTypeId) {
+    try {
+      return this.careerDAO.getCareerSkillsByTypeId(careerTypeId);
+    } catch (error) {
+      console.error('Error getting career skills:', error);
+      throw new Error('Failed to retrieve career skills');
+    }
+  }
 }
 
 module.exports = CareerRecommendationService;

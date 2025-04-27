@@ -61,6 +61,9 @@ export default function Login() {
       } else {
         toast.success("Login successful");
         console.log("User Data:", data.user);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
         router.push("/dashboard");
       }
     }

@@ -18,7 +18,7 @@ class CareerDAO extends BaseDAO {
   }
 
   async getCareerTypesByFieldId(fieldId) {
-    return this.findByField('CareerType', 'careerFieldId', fieldId);
+    return this.findByField('CareerType', 'careerfieldid', fieldId);
   }
 
   async getCareerSkills() {

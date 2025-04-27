@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+;
+
 
 /**
  * career routes implementation
@@ -91,6 +93,18 @@ module.exports = function(services) {
       next(error);
     }
   });
+  router.get('/skills/:careerTypeId', async (req, res, next) => {
+    try {
+      const { careerTypeId } = req.params;
+      const skills = await careerRecommendationService.getCareerSkillsByTypeId(careerTypeId);
+      res.json(skills);
+    } catch (error) {
+      console.error('API Error:', error);
+      next(error);
+    }
+  });
+  
+  
 
   return router;
 };
