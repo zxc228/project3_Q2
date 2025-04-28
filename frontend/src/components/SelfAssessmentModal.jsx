@@ -363,7 +363,7 @@ const SelfAssessmentModal = ({ isOpen, onClose }) => {
     </div>
   </div>
 )}
-      </div>
+      </div> 
     </div>
   );
 };
