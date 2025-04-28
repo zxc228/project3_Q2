@@ -55,23 +55,22 @@ const Dashboard = () => {
         <nav className="flex-grow">
           <ul>
             <li className="mb-2 cursor-pointer">Profile</li>
-            <li className="mb-2 cursor-pointer font-bold">Dashboard</li>
-            <li className="mb-2 cursor-pointer">Career Roadmap</li>
+            <li className="mb-2 cursor-pointer font-bold">Dashboard</li>  
           </ul>
         </nav>
         <button className="mt-auto border border-white px-4 py-2">
           Sign out
         </button>
-      </aside>
+      </aside> 
 
       {/* Main content */}
       <main className="flex-1 p-6 relative">
 
         {/* AI Career Coach Section */}
-        <section className="bg-gray-100 p-6 shadow rounded mb-6">
+        <section className="bg-gray-200 p-6 shadow rounded mb-6">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="font-semibold text-lg mb-2">AI Career Coach</h2>
+              <h1 className="text-sm text-gray-900 font-semibold text-lg mb-2">AI Career Coach</h1>
               <p className="text-sm text-gray-600 whitespace-pre-line">{aiCoachMessage}</p>
             </div>
             <div className="text-right">
@@ -121,11 +120,11 @@ const Dashboard = () => {
 
                 <div className="relative bg-gray-200 h-3 flex-1 rounded">
                   <div
-                    className="absolute top-[-2px] w-4 h-4 bg-blue-700 rounded-full z-10"
+                    className="absolute top-[0px] w-3 h-3 bg-blue-700 rounded-full z-10"
                     style={{ left: `${(skill.current / 5) * 100}%`, transform: 'translateX(-50%)' }}
                   ></div>
                   <div
-                    className="absolute top-[0px] w-3 h-3 bg-gray-500 rounded-full z-0"
+                    className="absolute top-[0px] w-3 h-3 bg-gray-300 rounded-full z-0"
                     style={{ left: `${(skill.desired / 5) * 100}%`, transform: 'translateX(-50%)' }}
                   ></div>
                 </div>
@@ -151,9 +150,7 @@ const Dashboard = () => {
         <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold text-lg">Self-Assessment</h2>
-            <button className="border px-4 py-2 rounded" onClick={handleClick}>
-              Complete Self-Assessment
-            </button>
+            <button onClick={() => setModalOpen(true)} className="border px-4 py-2 rounded">Complete Self-Assessment</button>
           </div>
           <div className="mt-4">
             <div className="bg-gray-200 p-4 rounded mb-2 flex justify-between items-center">
