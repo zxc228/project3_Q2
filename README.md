@@ -5,7 +5,7 @@
 - 📂 `src`
     - 📂 `logic` Contains the routes, each file in this folder is the logic for that route.
     - 📂 `infra` Each file in this folder contains code responsible for something in particular
-    - 📂 `index.js` Contains the express server.
+    - `index.js` Contains the express server.
 
 ## 🏗️ Setup 
  1. Be on a linux machine that uses the `apt` package manager, and have the `poppler-utils` package installed
