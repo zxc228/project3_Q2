@@ -4,12 +4,12 @@
 - 📂 `public` contains a static site that is hosted / served by the server, used for testing or showcasing the API.
 - 📂 `src`
         - 📂 `logic` Contains the routes, each file in this folder is the logic for that route.
-        - 📂 `infra` Each file in this folder contains code responsible for something.
-            - `constants.js` Contants like regex, prompts ... etc
-            - `deepseek.js` Requests with DeepSeek API
-            - `expediente.js` extracting grades from academic expedient `.html` file
-            - `mail.js` sending emails
-            - `textract.js` extracting text from websites, docx and pdf.
+        - 📂 `infra` Each file in this folder contains code responsible for something
+                - `constants.js` Contants like regex, prompts ... etc
+                - `deepseek.js` Requests with DeepSeek API
+                - `expediente.js` extracting grades from academic expedient `.html` file
+                - `mail.js` sending emails
+                - `textract.js` extracting text from websites, docx and pdf.
         - 📂 `index.js` Contains the express server.
 
 ## 🏗️ Setup 
