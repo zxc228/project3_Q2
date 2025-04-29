@@ -1,14 +1,16 @@
 # AI Feature and 👨‍🔬Research🧪
 
 ## 📜 Description of each Directory 
-- `notes` contains the **rokes-skills jsons**, and some brainstorming
-- `public` contains a static site that is hosted / served by the server
-- `src`
-    - **Short description of every file:**
-        - `constants.js` Contains regex, prompts and other constant-ish things
-        - `utils.js` Contains the classes to conveniently call Deepseek API, extract text from files and send emails
-        - `post_request.js` Encapsulates the logic to handle the single POST request of this server 
-        - `index.js` Contains the express server.
+- 📂 `public` contains a static site that is hosted / served by the server, used for testing or showcasing the API.
+- 📂 `src`
+        - 📂 `logic` Contains the routes, each file in this folder is the logic for that route.
+        - 📂 `infra` Each file in this folder contains code responsible for something.
+            - `constants.js` Contants like regex, prompts ... etc
+            - `deepseek.js` Requests with DeepSeek API
+            - `expediente.js` extracting grades from academic expedient `.html` file
+            - `mail.js` sending emails
+            - `textract.js` extracting text from websites, docx and pdf.
+        - 📂 `index.js` Contains the express server.
 
 ## 🏗️ Setup 
  1. Be on a linux machine that uses the `apt` package manager, and have the `poppler-utils` package installed
