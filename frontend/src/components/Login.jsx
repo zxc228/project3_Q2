@@ -6,7 +6,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 import Explanation from "./Explanation";
-import { toast } from 'react-hot-toast';
 
 export default function Login() {
   const router = useRouter();
@@ -65,7 +64,7 @@ export default function Login() {
     setErrors(newErrors);
 
     if (!newErrors.email && !newErrors.password) {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -73,13 +72,10 @@ export default function Login() {
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Login failed");
+        alert(data.error || "Login failed");
       } else {
-        toast.success("Login successful");
+        alert("Login successful");
         console.log("User Data:", data.user);
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
         router.push("/dashboard");
       }
     }
@@ -121,6 +117,8 @@ export default function Login() {
           </p>
         </div>
 
+        <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
+          <h1 className="text-custom-black font-montserrat font-[800] text-[28px]">
             What is U-TAD Path Finder (U-PaFi)?
           </h1>
           <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
