@@ -12,7 +12,7 @@ export default function Explanation({ isOpen, children, hoverTimeout }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      className="fixed inset-50 bg-black bg-opacity-50 flex justify-center items-center z-50"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
