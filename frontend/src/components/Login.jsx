@@ -1,18 +1,35 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 import Explanation from "./Explanation";
+import { toast } from 'react-hot-toast';
 
 export default function Login() {
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeout = useRef(null);
+
+  useEffect(() => {
+    const handler = () => setIsHovered(false);
+    window.addEventListener("closeExplanation", handler);
+    return () => window.removeEventListener("closeExplanation", handler);
+  }, []);
+
+  const handleHoverStart = () => {
+    clearTimeout(hoverTimeout.current);
+    setIsHovered(true);
+  };
+
+  const handleHoverEnd = () => {
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 5000);
+  };
 
   const [formData, setFormData] = useState({
     email: "",
@@ -48,7 +65,7 @@ export default function Login() {
     setErrors(newErrors);
 
     if (!newErrors.email && !newErrors.password) {
-      const res = await fetch("/api/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -56,10 +73,13 @@ export default function Login() {
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Login failed");
+        toast.error(data.error || "Login failed");
       } else {
-        alert("Login successful");
+        toast.success("Login successful");
         console.log("User Data:", data.user);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
         router.push("/dashboard");
       }
     }
@@ -84,7 +104,8 @@ export default function Login() {
             Welcome to U-PaFi{" "}
             <button
               className="inline-block"
-              onClick={openModal}
+              onMouseEnter={handleHoverStart}
+              onMouseLeave={handleHoverEnd}
               aria-label="Explanation"
             >
               <Image
@@ -99,11 +120,15 @@ export default function Login() {
             please enter your details
           </p>
         </div>
-        <Explanation isOpen={isModalOpen} closeModal={closeModal}>
-          <h1 className="text-custom-black font-montserrat text-[20px] text-center">
+
             What is U-TAD Path Finder (U-PaFi)?
           </h1>
-          <p className="text-custom-black font-400 font-montserrat text-[14px] mt-5 text-center">
+          <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
+            Lorem ipsum dolor sit amet consectetur. Ut nec pretium feugiat
+            aliquet egestas. Ac sed ultricies purus dui feugiat tincidunt orci.
+            Sit dictumst lectus est lectus laoreet.
+          </p>
+          <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
             Lorem ipsum dolor sit amet consectetur. Ut nec pretium feugiat
             aliquet egestas. Ac sed ultricies purus dui feugiat tincidunt orci.
             Sit dictumst lectus est lectus laoreet.
