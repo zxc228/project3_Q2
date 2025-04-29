@@ -121,8 +121,6 @@ export default function Login() {
           </p>
         </div>
 
-        <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
-          <h1 className="text-custom-black font-montserrat font-[800] text-[28px]">
             What is U-TAD Path Finder (U-PaFi)?
           </h1>
           <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
