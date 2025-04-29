@@ -8,8 +8,8 @@ export default function StudentProfile() {
   const [userData, setUserData] = useState({
     name: "Nombre Apellidos",
     location: "Location",
-    degree: "Degree",
-    year: "Year",
+    degree: "Degree Taught",
+    year: "Years of experience",
     link: "mylink.com",
   });
 
@@ -46,16 +46,28 @@ export default function StudentProfile() {
           <Image src="/u-tad-nobg.png" width={160} height={50} alt="Logo" />
           <nav className="mt-20 space-y-6 flex flex-col">
             <Link
-              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
               href={"/student-profile"}
             >
-              Profile
+              <Image
+                src={"/svg/Profile.svg"}
+                width={25}
+                height={25}
+                alt="Profile Link"
+              />
+              <span>Profile</span>
             </Link>
             <Link
-              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full"
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
               href={"/dashboard"}
             >
-              Dashboard
+              <Image
+                src={"/svg/Dashboard.svg"}
+                width={25}
+                height={25}
+                alt="Dashboard Link"
+              />
+              <span>Dashboard</span>
             </Link>
           </nav>
         </div>
@@ -129,7 +141,7 @@ export default function StudentProfile() {
             onChange={(e) => setUserData({ ...userData, link: e.target.value })}
           />
         </section>
-        
+
         <div className="mt-10 w-full border rounded-md p-4 border-custom-utad-logo">
           <p className="font-bold mb-4 text-[21px] text-custom-gray">
             About me...
