@@ -1,16 +1,27 @@
-export default function Explanation({ isOpen, closeModal, children }) {
+export default function Explanation({ isOpen, children, hoverTimeout }) {
   if (!isOpen) return null;
 
+  const handleMouseEnter = () => clearTimeout(hoverTimeout.current);
+
+  const handleMouseLeave = () => {
+    hoverTimeout.current = setTimeout(() => {
+      const closeEvent = new CustomEvent("closeExplanation");
+      window.dispatchEvent(closeEvent);
+    }, 200);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-md w-[30rem]">
-        <div className="mb-4">{children}</div>
-        <button
-          onClick={closeModal}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 mx-auto block mt-4"
-        >
-          Go Back
-        </button>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div
+        className="bg-white p-8 rounded-lg w-[40rem] border-custom-utad-logo border-4"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
       </div>
     </div>
   );
