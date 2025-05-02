@@ -162,6 +162,53 @@ class TutorService {
       throw error;
     }
   }
+
+  // searching a student by a substring of the name or the surname
+  async searchStudentsByName(searchTerm) {
+    try {
+      // getting students matching search term
+      const students = await this.tutorDAO.searchStudentsByName(searchTerm);
+      
+      // enriching with degree information
+      const enrichedStudents = await Promise.all(students.map(async (student) => {
+        let degree = null;
+        if (student.degreeId) {
+          degree = await this.academicDAO.getDegreeById(student.degreeId);
+        }
+        
+        return {
+          ...student,
+          degree: degree ? {
+            id: degree.id,
+            name: degree.name
+          } : null
+        };
+      }));
+      
+      return enrichedStudents;
+    } catch (error) {
+      console.error('Error searching students:', error);
+      throw error;
+    }
+  }
+
+  // by userId of the tutor and profileId of a student, checking that this tutor is assigned to this tutor. to be used mainly in the file access functionality
+  async isTutorForStudent(userId, profileId) {
+    try {
+      // getting tutor by user id
+      const tutor = await this.tutorDAO.getTutorByUserId(userId);
+      if (!tutor) {
+        return false;
+      }
+      
+      // checking if this tutor is assigned to the student
+      const profile = await this.profileDAO.getProfileById(profileId);
+      return profile && profile.tutorId === tutor.id;
+    } catch (error) {
+      console.error('Error checking tutor relationship:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = TutorService;

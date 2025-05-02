@@ -6,6 +6,7 @@ const authRoutes = require('./auth-routes');
 const authMiddleware = require('../config/auth-middleware');
 const tutorRoutes = require('./tutor-routes');
 const profileTutorRoutes = require('./profile-tutor-routes');
+const fileAccessRoutes = require('./file-access-routes');
 
 
 /**
@@ -30,6 +31,7 @@ module.exports = function(app, services) {
   app.use('/api/careers', authenticate, careerRoutes(services));
   app.use('/api/reports', authenticate, reportRoutes(services));
   app.use('/api/tutors', authenticate, tutorRoutes(services));
+  app.use('/api/files', authenticate, fileAccessRoutes(services));
   
   // catchall route for 404 errors
   app.use('/api/*', (req, res) => {

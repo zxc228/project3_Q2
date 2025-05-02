@@ -117,6 +117,70 @@ Authenticates a user and returns a JWT token.
 
 ---
 
+### Forgot Password
+
+Initiates the password reset process.
+
+**URL:** `/api/auth/forgot-password`  
+**Method:** `POST`  
+**Auth Required:** No
+
+**Request Body:**
+```json
+{
+  "email": "john.doe@live.u-tad.com"
+}
+```
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+{
+  "message": "Password reset link has been sent to your email"
+}
+```
+
+**Error Response:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Email is required" }`
+
+---
+
+### Reset Password
+
+Resets the user's password using a token.
+
+**URL:** `/api/auth/reset-password`  
+**Method:** `POST`  
+**Auth Required:** No
+
+**Request Body:**
+```json
+{
+  "token": "reset-token-provided-in-email",
+  "newPassword": "newSecurePassword123"
+}
+```
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+{
+  "message": "Password has been reset successfully"
+}
+```
+
+**Error Response:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Token and new password are required" }`
+
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Invalid or expired token" }`
+
+---
+
 ## Profile Endpoints
 
 There are two types of Profiles in the platform:
@@ -191,7 +255,10 @@ Retrieves detailed profile information including academic data and assigned tuto
     "degreeId": "deg_data",
     "graduationYear": 2026,
     "bio": "Data Engineering student with a passion for travel...",
-    "tutorId": "tutor_1"
+    "tutorId": "tutor_1",
+    "academicRecordPath": "/api/files/academic_records/academic-records-1588324500.pdf",
+    "cvPath": "/api/files/cvs/cv-1588324500.pdf",
+    "completedCredits": 150
   },
   "user": {
     "id": "user_alice",
@@ -225,12 +292,60 @@ Retrieves detailed profile information including academic data and assigned tuto
     ]
   },
   "tutor": {
-    "id": "tutor_1",
-    "firstName": "Carlos",
-    "lastName": "Montero",
-    "specialization": "Advanced Data Science",
-    "department": "Data Engineering"
+    "id": "alberto",
+    "userId": "user_alberto",
+    "firstName": "Alberto",
+    "lastName": "Leon Martin",
+    "bio": "Professor, manager, business coach"
   }
+}
+```
+
+**Error Response:**  
+**Code:** `404 Not Found`  
+**Content:** `{ "error": "Profile not found" }`
+
+---
+
+### Get Complete Student Profile
+
+Retrieves detailed profile information including academic data, skills, and completed credits.
+
+**URL:** `/api/profiles/:id/complete-student`  
+**Method:** `GET`  
+**Auth Required:** Yes  
+**URL Params:** `id=[string]` (Profile ID)
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+{
+  "profile": {
+    // Profile data as in the previous endpoint
+  },
+  "user": {
+    // User data as in the previous endpoint
+  },
+  "academic": {
+    // Academic data as in the previous endpoint
+  },
+  "tutor": {
+    // Tutor data as in the previous endpoint
+  },
+  "skills": [
+    {
+      "id": "ps_alice_sql",
+      "profileId": "profile_alice",
+      "skillId": "skill_sql",
+      "skillName": "SQL",
+      "skillDescription": "Structured Query Language for database management and queries.",
+      "skillLevel": 4.8,
+      "updatedAt": "2025-04-27T14:30:00.000Z"
+    },
+    // Additional skills...
+  ],
+  "completedCredits": 150
 }
 ```
 
@@ -255,7 +370,7 @@ Updates profile information.
   "firstName": "Alice M.",
   "lastName": "Asher",
   "degreeId": "deg_data",
-  "graduationYear": 2027,
+  "graduationYear": 2026,
   "bio": "Updated bio information..."
 }
 ```
@@ -270,7 +385,7 @@ Updates profile information.
   "firstName": "Alice M.",
   "lastName": "Asher",
   "degreeId": "deg_data",
-  "graduationYear": 2027,
+  "graduationYear": 2026,
   "bio": "Updated bio information..."
 }
 ```
@@ -285,6 +400,241 @@ Updates profile information.
 **Code:** `404 Not Found`  
 **Content:** `{ "error": "Profile not found" }`
 
+---
+
+### Add Courses to Profile
+
+Adds courses to a student profile with IN_PROGRESS status.
+
+**URL:** `/api/profiles/:id/courses`  
+**Method:** `POST`  
+**Auth Required:** Yes  
+**URL Params:** `id=[string]` (Profile ID)
+
+**Request Body:**
+```json
+{
+  "courses": [
+    { "subjectId": "sub_pro3" },
+    { "subjectId": "sub_fuux" }
+  ]
+}
+```
+
+**Success Response:**  
+**Code:** `201 Created`  
+**Content:**
+```json
+[
+  {
+    "id": "grade_profile_alice_sub_pro3",
+    "profileId": "profile_alice",
+    "subjectId": "sub_pro3",
+    "grade": 0,
+    "status": "IN_PROGRESS"
+  },
+  {
+    "id": "grade_profile_alice_sub_fuux",
+    "profileId": "profile_alice",
+    "subjectId": "sub_fuux",
+    "grade": 0,
+    "status": "IN_PROGRESS"
+  }
+]
+```
+
+**Error Responses:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Valid courses array is required" }`
+
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Invalid subject: sub_xyz" }`
+
+**Code:** `404 Not Found`  
+**Content:** `{ "error": "Profile not found" }`
+
+---
+
+### Add Grades to Profile
+
+Adds grades to a student profile.
+
+**URL:** `/api/profiles/:id/grades`  
+**Method:** `POST`  
+**Auth Required:** Yes  
+**URL Params:** `id=[string]` (Profile ID)
+
+**Request Body:**
+```json
+{
+  "grades": [
+    { 
+      "subjectId": "sub_pro3", 
+      "grade": 8.5, 
+      "status": "COMPLETED" 
+    },
+    { 
+      "subjectId": "sub_fuux", 
+      "grade": 10 
+    }
+  ]
+}
+```
+
+**Success Response:**  
+**Code:** `201 Created`  
+**Content:**
+```json
+[
+  {
+    "id": "grade_profile_alice_sub_pro3",
+    "profileId": "profile_alice",
+    "subjectId": "sub_pro3",
+    "grade": 8.5,
+    "status": "COMPLETED"
+  },
+  {
+    "id": "grade_profile_alice_sub_fuux",
+    "profileId": "profile_alice",
+    "subjectId": "sub_fuux",
+    "grade": 10,
+    "status": "COMPLETED"
+  }
+]
+```
+
+**Error Responses:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Valid grades array is required" }`
+
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Invalid subject: sub_xyz" }`
+
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Invalid grade value for sub_pro3: 11.5" }`
+
+**Code:** `404 Not Found`  
+**Content:** `{ "error": "Profile not found" }`
+
+---
+
+### Upload Academic Record
+
+Uploads an academic record file for a student.
+
+**URL:** `/api/profiles/:id/upload-academic-record`  
+**Method:** `POST`  
+**Auth Required:** Yes  
+**URL Params:** `id=[string]` (Profile ID)  
+**Content-Type:** `multipart/form-data`
+
+**Form Fields:**
+- `academicRecord`: The file to upload
+- `parseFile`: Boolean (optional) - Whether to parse the file contents
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+{
+  "profile": {
+    "id": "profile_alice",
+    "academicRecordPath": "/api/files/academic_records/academic-records-1588324500.pdf",
+    // other profile fields...
+  },
+  "parsedData": {
+    "degreeId": "deg_data",
+    "completedCredits": 150,
+    "grades": [
+      {
+        "subjectId": "sub_pro3",
+        "grade": 8.5,
+        "status": "COMPLETED"
+      }
+      // additional grades...
+    ]
+  }
+}
+```
+
+**Error Responses:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "No file uploaded" }`
+
+**Code:** `403 Forbidden`  
+**Content:** `{ "error": "Not authorized to upload files for this profile" }`
+
+**Code:** `404 Not Found`  
+**Content:** `{ "error": "Profile not found" }`
+
+---
+
+### Upload CV
+
+Uploads a CV file for a student.
+
+**URL:** `/api/profiles/:id/upload-cv`  
+**Method:** `POST`  
+**Auth Required:** Yes  
+**URL Params:** `id=[string]` (Profile ID)  
+**Content-Type:** `multipart/form-data`
+
+**Form Fields:**
+- `cv`: The CV file to upload
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+{
+  "profile": {
+    "id": "profile_alice",
+    "cvPath": "/api/files/cvs/cv-1588324500.pdf",
+    // other profile fields...
+  }
+}
+```
+
+**Error Responses:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "No file uploaded" }`
+
+**Code:** `403 Forbidden`  
+**Content:** `{ "error": "Not authorized to upload files for this profile" }`
+
+**Code:** `404 Not Found`  
+**Content:** `{ "error": "Profile not found" }`
+
+---
+
+## File Access Endpoints
+
+### Get Protected File
+
+Retrieves a file with proper authentication and authorization checks.
+
+**URL:** `/api/files/:type/:filename`  
+**Method:** `GET`  
+**Auth Required:** Yes  
+**URL Params:** 
+- `type=[string]` (File type: academic_records, cvs, or reports)
+- `filename=[string]` (Filename)
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:** The requested file with appropriate Content-Type header
+
+**Error Responses:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Invalid file type" }`
+
+**Code:** `403 Forbidden`  
+**Content:** `{ "error": "Access denied" }`
+
+**Code:** `404 Not Found`  
+**Content:** `{ "error": "File not found" }`
+
+---
 
 ## Tutor Endpoints
 
@@ -340,6 +690,42 @@ Retrieves a specific tutor's information.
 **Error Response:**  
 **Code:** `404 Not Found`  
 **Content:** `{ "error": "Tutor not found" }`
+
+---
+
+### Search Students by Name
+
+Searches for students by name.
+
+**URL:** `/api/tutors/search-students`  
+**Method:** `GET`  
+**Auth Required:** Yes  
+**Query Params:** `name=[string]` (Search term)
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+[
+  {
+    "id": "profile_alice",
+    "firstName": "Alice",
+    "lastName": "Asher",
+    "degreeId": "deg_data",
+    "degree": {
+      "id": "deg_data",
+      "name": "Data Engineering"
+    },
+    "email": "alice.asher@live.u-tad.com",
+    "tutorId": "alberto"
+  },
+  // Other matching students...
+]
+```
+
+**Error Response:**  
+**Code:** `400 Bad Request`  
+**Content:** `{ "error": "Search term must be at least 2 characters" }`
 
 ---
 
@@ -539,7 +925,8 @@ Retrieves the tutor assigned to a student.
   "userId": "user_alberto",
   "firstName": "Alberto",
   "lastName": "Leon Martin",
-  "bio": "Professor, manager, business coach"
+  "bio": "Professor, manager, business coach",
+  "email": "alberto_example@u-tad.com"
 },
 ```
 
@@ -805,6 +1192,34 @@ Returns all career types (job/internship) for a specific field.
     "type": "JOB",
     "description": "Professional role building and optimizing data pipelines."
   }
+]
+```
+
+---
+
+### Get Career Skills by Type
+
+Returns all skills required for a specific career type.
+
+**URL:** `/api/careers/skills/:careerTypeId`  
+**Method:** `GET`  
+**Auth Required:** Yes  
+**URL Params:** `careerTypeId=[string]` (Career Type ID)
+
+**Success Response:**  
+**Code:** `200 OK`  
+**Content:**
+```json
+[
+  {
+    "id": "cs_de_job_dw",
+    "careerTypeId": "ct_de_job",
+    "skillId": "skill_dw",
+    "importanceLevel": 5.0,
+    "skillName": "Data Warehousing",
+    "skillDescription": "Advanced concepts in data storage architecture."
+  },
+  // Additional skills...
 ]
 ```
 

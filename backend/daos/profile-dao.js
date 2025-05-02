@@ -21,6 +21,44 @@ class ProfileDAO extends BaseDAO {
   async getStudentGrades(profileId) {
     return this.findByField('StudentGrade', 'profileId', profileId);
   }
+
+  async createGrade(gradeData) {
+    return this.create('StudentGrade', gradeData);
+  }
+
+  async updateGrade(id, gradeData) {
+    return this.update('StudentGrade', id, gradeData);
+  }
+
+  async getStudentGradeBySubjectId(profileId, subjectId) {
+    const query = `
+      SELECT * FROM "StudentGrade"
+      WHERE "profileId" = $1 AND "subjectId" = $2
+    `;
+    
+    const result = await this.query(query, [profileId, subjectId]);
+    return result.length ? result[0] : null;
+  }
+
+  async getCompletedCredits(profileId) {
+    const query = `
+      SELECT SUM(s.credits) as completedCredits
+      FROM "StudentGrade" sg
+      JOIN "Subject" s ON sg.subjectId = s.id
+      WHERE sg.profileId = $1 AND sg.status = 'COMPLETED'
+    `;
+  }
+
+  // this method is needed to check user permissions before accessing any file
+  async getProfileIdByFilePath(filePath) {
+    const query = `
+      SELECT id FROM "Profile" 
+      WHERE "academicRecordPath" = $1 OR "cvPath" = $1
+    `;
+    
+    const result = await this.query(query, [filePath]);
+    return result.length ? result[0].id : null;
+  }
 }
 
 module.exports = ProfileDAO;

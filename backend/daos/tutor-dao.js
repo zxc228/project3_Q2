@@ -25,6 +25,19 @@ class TutorDAO extends BaseDAO {
   async getStudentsByTutorId(tutorId) {
     return this.findByField('Profile', 'tutorId', tutorId);
   }
+  async searchStudentsByName(searchTerm) {
+    const query = `
+      SELECT p.id, p.firstName, p.lastName, p.degreeId, u.email, p.tutorId
+      FROM "Profile" p
+      JOIN "User" u ON p.userId = u.id
+      WHERE 
+        LOWER(p.firstName) LIKE LOWER($1) OR
+        LOWER(p.lastName) LIKE LOWER($1)
+      LIMIT 20
+    `;
+    
+    return this.query(query, [`%${searchTerm}%`]);
+  }
 }
 
 module.exports = TutorDAO;

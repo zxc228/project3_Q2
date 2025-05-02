@@ -5,6 +5,7 @@
 - **Skill Assessment**: Automatically evaluates student skills based on academic grades and allows self-assessment
 - **Career Recommendations**: Suggest the best career path based on skill proficiency and/or evaluates a career path against student's skills
 - **Career Reports**: Generates reports showing skills and improvement areas for a specific career path
+- **File Management**: Secure uploading and retrieval of academic records and CV files
 - **PDF Generation**: Creates PDF reports for students to share with tutors
 
 ## System Architecture
@@ -13,9 +14,8 @@
 2. **Service Layer**: Business logic coordination
 3. **Logic Layer**: Core algorithms and calculations
 4. **Routes Layer**: API endpoints and request handling
-5. **Database**: PostgreSQL database for data persistence
-
-
+5. **Config Layer**: System configuration and middleware
+6. **Database**: PostgreSQL database for data persistence
 
 ## Database Structure
 
@@ -40,20 +40,55 @@
 - **CareerReport**: Stores career assessment reports
 - **SkillAssessment**: Stores skill evaluations within reports
 
+## File Management
 
+The system implements a secure file management approach:
+
+1. **Private Storage**: Files are stored in a private directory structure not directly accessible via HTTP
+2. **Secure Access**: Files are served through authenticated API endpoints with proper authorization checks
+3. **File Types**:
+   - Academic Records: Student academic transcripts (PDF/HTML/Excel)
+   - CVs: Student resumes (PDF)
+   - Reports: Generated career recommendation reports (HTML/PDF)
 
 ## API Documentation
 
-The API is organized around four main parts: Profiles, SKills, Careers, and Reports. For more information, see `api-documentation.md`.
+The API is organized around several main parts: Authentication, Profiles, Skills, Careers, Reports, and Files. For more information, see `api-documentation.md`.
+
+### Authentication
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/register` | POST | Create new user account |
+| `/api/auth/login` | POST | Authenticate and get token |
+| `/api/auth/forgot-password` | POST | Request password reset |
+| `/api/auth/reset-password` | POST | Reset password with token |
 
 ### Profiles
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/profiles/login` | POST | Authenticate user |
-| `/api/profiles/:id` | GET | Get complete profile information |
+| `/api/profiles/:id` | GET | Get profile information |
 | `/api/profiles/:id` | PUT | Update profile information |
+| `/api/profiles/:id/complete-student` | GET | Get complete profile with skills |
+| `/api/profiles/:id/courses` | POST | Add courses to profile |
+| `/api/profiles/:id/grades` | POST | Add grades to profile |
+| `/api/profiles/:id/upload-academic-record` | POST | Upload academic record |
+| `/api/profiles/:id/upload-cv` | POST | Upload CV |
 
+### Tutors
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/tutors` | GET | List all tutors |
+| `/api/tutors/:id` | GET | Get tutor by ID |
+| `/api/tutors` | POST | Create tutor profile |
+| `/api/tutors/:id` | PUT | Update tutor profile |
+| `/api/tutors/:id/students` | GET | Get tutor's students |
+| `/api/tutors/search-students` | GET | Search students by name |
+| `/api/profiles/:profileId/tutor` | PUT | Assign tutor to student |
+| `/api/profiles/:profileId/tutor` | GET | Get student's tutor |
 
 ### Skills
 
@@ -65,16 +100,15 @@ The API is organized around four main parts: Profiles, SKills, Careers, and Repo
 | `/api/profiles/:id/skills/:skillId` | PUT | Update a specific skill |
 | `/api/profiles/:id/skills` | PUT | Bulk update skills (self-assessment) |
 
-
 ### Careers
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/careers/fields` | GET | List all career fields |
 | `/api/careers/fields/:id/types` | GET | Get career types for a field |
+| `/api/careers/skills/:careerTypeId` | GET | Get skills for a career type |
 | `/api/profiles/:id/recommendations` | GET | Get career recommendations |
 | `/api/profiles/:id/recommendations/:careerTypeId` | GET | Get specific career assessment |
-
 
 ### Reports
 
@@ -83,11 +117,15 @@ The API is organized around four main parts: Profiles, SKills, Careers, and Repo
 | `/api/profiles/:id/reports` | GET | List reports for a profile |
 | `/api/reports/:id` | GET | Get report details |
 | `/api/reports` | POST | Create a new report |
+| `/api/profiles/:id/save-recommendation` | POST | Save career recommendation |
 | `/api/reports/:reportId/assessments/:id` | PUT | Update assessment |
 | `/api/reports/:id/pdf` | GET | Generate PDF for a report |
 
+### Files
 
-
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/files/:type/:filename` | GET | Get protected file |
 
 ## Logic Algorithms
 
@@ -125,6 +163,10 @@ Fitness score calculation:
 
 ```
 utad-tutorship-platform/
+├── config/                 # Configuration files
+│   ├── auth-middleware.js  # Authentication middleware
+│   ├── file-storage.js     # File upload configuration
+│
 ├── daos/                   # Data Access Objects
 │   ├── base-dao.js         # Common database operations
 │   ├── user-dao.js         # User data access
@@ -133,6 +175,8 @@ utad-tutorship-platform/
 │   ├── skills-dao.js       # Skills data access
 │   ├── career-dao.js       # Career data access
 │   ├── report-dao.js       # Report data access
+│   ├── auth-dao.js         # Authentication data access
+│   ├── tutor-dao.js        # Tutor data access
 │   ├── dao-index.js        # DAO initialization
 │   └── db-config.js        # Database configuration
 │
@@ -141,6 +185,9 @@ utad-tutorship-platform/
 │   ├── skill-service.js    # Skill assessment and management
 │   ├── career-recommendation-service.js  # Career recommendations
 │   ├── report-service.js   # Report generation and management
+│   ├── auth-service.js     # Authentication and authorization
+│   ├── tutor-service.js    # Tutor profile management
+│   ├── academic-parser-service.js # Academic record parsing
 │   └── service-index.js    # Service initialization
 │
 ├── logic/                  # Core Algorithms
@@ -151,7 +198,20 @@ utad-tutorship-platform/
 │   ├── skill-routes.js     # Skills API endpoints
 │   ├── career-routes.js    # Career API endpoints
 │   ├── report-routes.js    # Report API endpoints
+│   ├── auth-routes.js      # Authentication endpoints
+│   ├── tutor-routes.js     # Tutor management endpoints
+│   ├── profile-tutor-routes.js # Student-tutor relationship
+│   ├── file-access-routes.js # Protected file access
 │   └── routes-index.js     # Route registration
+│
+├── private/                # Private file storage (not web-accessible)
+│   └── uploads/            # Uploaded files
+│       ├── academic_records/  # Student academic records
+│       ├── cvs/            # Student CVs
+│       └── reports/        # Generated reports
+│
+├── public/                 # Public static files
+│   └── reports/            # Legacy location for public reports
 │
 ├── app-setup.js           # Express application setup
 ├── server.js              # Server entry point
