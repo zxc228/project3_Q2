@@ -64,7 +64,7 @@ export default function Login() {
     setErrors(newErrors);
 
     if (!newErrors.email && !newErrors.password) {
-      const res = await fetch("/api/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -75,8 +75,13 @@ export default function Login() {
         alert(data.error || "Login failed");
       } else {
         alert("Login successful");
-        console.log("User Data:", data.user);
+        localStorage.setItem("token", data.token);
+        const nameRaw = data.user.id; // "Ilya Istomin"
+        const profileId = "profile_" + nameRaw.trim().toLowerCase().replace(/\s+/g, "_");
+        localStorage.setItem("profileId", profileId);
+
         router.push("/dashboard");
+    
       }
     }
   };

@@ -150,7 +150,8 @@ const Dashboard = () => {
         <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold text-lg">Self-Assessment</h2>
-            <button onClick={() => setModalOpen(true)} className="border px-4 py-2 rounded">Complete Self-Assessment</button>
+            <button onClick={handleClick} className="border px-4 py-2 rounded">Complete Self-Assessment</button>
+
           </div>
           <div className="mt-4">
             <div className="bg-gray-200 p-4 rounded mb-2 flex justify-between items-center">
