@@ -41,8 +41,25 @@ class SkillsDAO extends BaseDAO {
   }
 
   async createProfileSkill(profileSkillData) {
-    return this.create('ProfileSkill', profileSkillData);
+    const { profileId, skillId, skillLevel } = profileSkillData;
+  
+    const id = `ps_${profileId}_${skillId}`;
+    const updatedAt = new Date().toISOString();
+  
+    const rows = await this.query(
+      `INSERT INTO "ProfileSkill"(id, profileId, skillId, skillLevel, updatedAt)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (id)
+       DO UPDATE
+       SET skillLevel = EXCLUDED.skillLevel,
+           updatedAt  = EXCLUDED.updatedAt
+       RETURNING *`,
+      [id, profileId, skillId, skillLevel, updatedAt]
+    );
+  
+    return rows[0];
   }
+  
 
   async updateProfileSkill(id, profileSkillData) {
     return this.update('ProfileSkill', id, profileSkillData);

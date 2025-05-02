@@ -99,62 +99,62 @@ class SkillService {
   }
 
   // updating multiple skills at once (also for self-assessment)
+   
   async updateProfileSkills(profileId, skills) {
     try {
-      // validating profile exists
+      // validate profile
       const profile = await this.profileDAO.getProfileById(profileId);
       if (!profile) {
         throw new Error('Profile not found');
       }
 
-      // getting current profile skills
+      // get current profile skills
       const currentSkills = await this.skillsDAO.getProfileSkills(profileId);
       const skillMap = new Map();
-      
-      // creating a map for quick lookup
       currentSkills.forEach(skill => {
         skillMap.set(skill.skillId, skill);
       });
 
-      // preparing updates
       const updates = [];
-      
-      for (const skill of skills) {
-        // validating skill level
-        if (skill.skillLevel < 0 || skill.skillLevel > 5) {
-          throw new Error(`Skill level for ${skill.skillId} must be between 0 and 5`);
-        }
 
-        const currentSkill = skillMap.get(skill.skillId);
-        
-        if (currentSkill) {
-          // adding to update list if exists
-          updates.push({
-            id: currentSkill.id,
-            skillLevel: skill.skillLevel
-          });
+      for (const raw of skills) {
+        // фронт может прислать { id, current } или { skillId, skillLevel }
+        const skillId     = raw.skillId  || raw.id;
+        const skillLevel  = raw.skillLevel ?? raw.current;
+      
+        if (!skillId) continue;               // защита от мусора
+        if (skillLevel < 0 || skillLevel > 5) {
+          throw new Error(`Skill level for ${skillId} must be between 0 and 5`);
+        }
+      
+        const existing = skillMap.get(skillId);
+      
+        if (existing) {
+          updates.push({ id: existing.id, skillLevel });
         } else {
-          // creating if not exists
+          const generatedId = `ps_${profileId}_${skillId}`;
           await this.skillsDAO.createProfileSkill({
+            id: generatedId,
             profileId,
-            skillId: skill.skillId,
-            skillLevel: skill.skillLevel
+            skillId,
+            skillLevel
           });
         }
       }
+      
 
-      // bulk update if we have updates
+      // bulk update
       if (updates.length > 0) {
         await this.skillsDAO.bulkUpdateProfileSkills(updates);
       }
 
-      // getting updated skills
       return this.getProfileSkills(profileId);
     } catch (error) {
       console.error('Error updating profile skills:', error);
       throw new Error('Failed to update profile skills');
     }
   }
+
 
   // getting all available skills in the system
   async getAllSkills() {

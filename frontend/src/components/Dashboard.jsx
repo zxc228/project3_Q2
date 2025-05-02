@@ -54,7 +54,12 @@ const Dashboard = () => {
         <div className="text-lg font-bold mb-5">U-Tad</div>
         <nav className="flex-grow">
           <ul>
-            <li className="mb-2 cursor-pointer">Profile</li>
+          <li 
+              className="mb-2 cursor-pointer hover:underline"
+              onClick={() => router.push("/student-profile")}
+            >
+              Profile
+            </li>
             <li className="mb-2 cursor-pointer font-bold">Dashboard</li>  
           </ul>
         </nav>

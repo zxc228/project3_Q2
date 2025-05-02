@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Assessment() {
+
+
+  function getMedal(value) {
+    if (value >= 4.5) return "🥇";
+    if (value >= 3.5) return "🥈";
+    if (value >= 2.5) return "🥉";
+    return "";
+  }
+  
   const router = useRouter();   
   // ────────────────────────── state
   const [currentStep, setCurrentStep] = useState(1);
@@ -88,7 +97,6 @@ export default function Assessment() {
           name        : s.skillname,
           description : s.skilldescription,
           current     : 0,
-          medal       : ""
         }))
       }));
 
@@ -98,11 +106,43 @@ export default function Assessment() {
     finally { setLoadingSkills(false); }
   };
 
-  const handleFinish = () => {
-    localStorage.setItem("upaFiAssessmentData", JSON.stringify(assessmentData));
-    console.log("Saved Assessment:", assessmentData);
-    router.push("/dashboard"); 
+  const handleFinish = async () => {
+    const token = localStorage.getItem("token");
+    const profileId = localStorage.getItem("profileId");
+  
+    if (!token || !profileId) {
+      console.error("Missing token or profileId");
+      return;
+    }
+  
+    // Prepare skill data
+    const payload = {
+      skills: assessmentData.skills.map((s) => ({
+        skillId: s.id,
+        skillLevel: s.current
+      }))
+    };
+  
+    try {
+      const res = await fetch(`/api/skills/profiles/${profileId}/skills`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      if (!res.ok) throw new Error("Failed to update skills");
+  
+      console.log("Skills successfully updated in profile.");
+      router.push("/dashboard");
+  
+    } catch (err) {
+      console.error("Skill update error:", err);
+    }
   };
+  
 
   // ────────────────────────── UI
   return (
@@ -196,38 +236,29 @@ export default function Assessment() {
             : (
               <div className="flex flex-col gap-6 overflow-y-auto">
                 {assessmentData.skills.map((skill, idx) => (
-                  <div key={skill.id} className="flex items-center gap-4">
-                    <div className="w-60 flex items-center gap-2 font-medium">
-                      <select
-                        value={skill.medal}
-                        onChange={e => {
-                          const upd=[...assessmentData.skills];
-                          upd[idx].medal = e.target.value;
-                          setAssessmentData(p => ({...p, skills: upd}));
-                        }}
-                        className="rounded-md text-sm px-1 py-[2px] focus:outline-blue-600"
-                      >
-                        <option value="">+</option>
-                        <option value="🥇">🥇</option>
-                        <option value="🥈">🥈</option>
-                        <option value="🥉">🥉</option>
-                      </select>
-                      <span className="text-gray-800">{skill.name}</span>
-                    </div>
+                    <div key={skill.id} className="flex items-center gap-4">
+                      <div className="w-60 flex items-center gap-2 font-medium">
+                        <span className="text-xl">{getMedal(skill.current)}</span>
+                        <span className="text-gray-800">{skill.name}</span>
+                      </div>
 
-                    <input
-                      type="range" min="0" max="5" step="0.5"
-                      value={skill.current}
-                      onChange={e => {
-                        const upd=[...assessmentData.skills];
-                        upd[idx].current = parseFloat(e.target.value);
-                        setAssessmentData(p => ({...p, skills: upd}));
-                      }}
-                      className="flex-1 h-2 bg-gray-200 rounded-lg accent-blue-600"
-                    />
-                    <div className="w-20 text-center font-semibold">{skill.current}</div>
-                  </div>
-                ))}
+                      <input
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="0.5"
+                        value={skill.current}
+                        onChange={(e) => {
+                          const updated = [...assessmentData.skills];
+                          updated[idx].current = parseFloat(e.target.value);
+                          setAssessmentData((prev) => ({ ...prev, skills: updated }));
+                        }}
+                        className="flex-1 h-2 bg-gray-200 rounded-lg accent-blue-600"
+                      />
+                      <div className="w-20 text-center font-semibold">{skill.current}</div>
+                    </div>
+                  ))}
+
               </div>
             )}
 

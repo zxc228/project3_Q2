@@ -1,4 +1,9 @@
 // base dao class with common database operations
+
+function camelToSnake(str) {
+  return str.replace(/[A-Z]/g, letter => `${letter.toLowerCase()}`);
+}
+
 class BaseDAO {
   constructor(pool) {
     this.pool = pool;
@@ -40,7 +45,7 @@ class BaseDAO {
 
   // creating a new record
   async create(table, data) {
-    const fields = Object.keys(data);
+    const fields = Object.keys(data).map(camelToSnake);;
     const values = Object.values(data);
     const placeholders = fields.map((_, i) => `$${i + 1}`).join(', ');
     const fieldNames = fields.map(field => `"${field}"`).join(', ');
