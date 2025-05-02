@@ -132,5 +132,25 @@ module.exports = function(services) {
     }
   });
 
+  /**
+   * searching students by name
+   * GET /api/tutors/search-students
+   */
+  router.get('/search-students', async (req, res, next) => {
+    try {
+      const { name } = req.query;
+      
+      if (!name || name.trim().length < 2) {
+        return res.status(400).json({ error: 'Search term must be at least 2 characters' });
+      }
+      
+      const students = await tutorService.searchStudentsByName(name);
+      
+      res.json(students);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 };
