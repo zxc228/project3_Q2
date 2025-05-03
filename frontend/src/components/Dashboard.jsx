@@ -9,6 +9,76 @@ const Dashboard = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("progress");
 
+
+  const [selectedDescription, setSelectedDescription] = useState("");
+  const [selectedFitness, setSelectedFitness] = useState("");
+  
+
+  const loadDescription = async (careerTypeId) => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      console.error("No auth token found");
+      setSelectedDescription("No description available.");
+      return;
+    }
+  
+    try {
+      const res = await fetch(`/api/careers/types/${careerTypeId}/description`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await res.json();
+      setSelectedDescription(data.description || "No description available.");
+    } catch (err) {
+      console.error("Failed to fetch description", err);
+      setSelectedDescription("No description available.");
+    }
+  };
+  
+  
+  const handleGeneratePDF = async () => {
+    const token = localStorage.getItem("token");
+    const track = recommendations.find(r => r.careerTypeId === selectedTrack);
+  
+    if (!token || !track) {
+      alert("Missing token or selected track");
+      return;
+    }
+  
+    try {
+      const response = await fetch("/api/careers/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ topRecommendations: [track] })
+      });
+  
+      // if (!response.ok) {
+      //   throw new Error("Failed to generate PDF");
+      // }
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+  
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${track.careerFieldName}_${track.careerType}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("Failed to generate PDF.");
+    }
+  };
+  
+
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -52,7 +122,11 @@ const Dashboard = () => {
         setCareerTracks(trackNames);
         setSelectedTrack(trackNames[0].id);
 
-        // изначально показать навыки первого трека
+
+        loadDescription(trackNames[0].id);
+
+        const firstFitness = Math.round((top[0].fitnessScore / 5) * 100);
+        setSelectedFitness(`${firstFitness}%`);
         const initial = top.find(r => r.careerFieldName === trackNames[0]);
         if (initial) {
           const s = initial.skillAssessments.map(skill => ({
@@ -138,6 +212,8 @@ const Dashboard = () => {
                 onChange={(e) => {
                   const selectedId = e.target.value;
                   setSelectedTrack(selectedId);
+                  loadDescription(selectedId);
+
                   const found = recommendations.find(r => r.careerTypeId === selectedId);
                   if (found) {
                     const newSkills = found.skillAssessments.map(skill => ({
@@ -146,6 +222,7 @@ const Dashboard = () => {
                       desired: skill.currentLevel + (skill.gap || 0),
                     }));
                     setSkills(newSkills);
+                    setSelectedFitness(`${Math.round((found.fitnessScore / 5) * 100)}%`);
                   }
                 }}
                 className="border rounded px-2 py-1 text-blue-600 font-semibold"
@@ -156,15 +233,19 @@ const Dashboard = () => {
               </select>
 
             </div>
-            <button className="border px-4 py-2 rounded text-sm font-semibold">Generate PDF</button>
+            <button onClick={handleGeneratePDF} className="border px-4 py-2 rounded text-sm font-semibold">
+              Generate PDF
+            </button>
+
           </div>
 
-          {/* <p className="text-sm text-gray-600 mb-2">
-            A data analyst collects, processes, and analyzes data to help organizations make informed decisions. They use tools and techniques to identify trends, patterns, and insights in data.
+          <p className="text-sm text-gray-600 mb-2">
+            {selectedDescription}
           </p>
           <p className="text-sm text-gray-600 mb-4">
-            If you enjoy working with numbers, problem-solving, and making sense of data, this field could be a great fit!
-          </p> */}
+            You are {selectedFitness} fit for this position.
+          </p>
+
 
           <div className="flex justify-between items-center mb-1">
             <h3 className="font-semibold mb-1">Skills</h3>
@@ -207,8 +288,8 @@ const Dashboard = () => {
         {/* Self Assessment placeholder */}
         <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-lg">Expedientes Académicos Assessment</h2>
-            <button className="border px-4 py-2 rounded">Complete Expedientes Académicos Assessment</button>
+            <h2 className="font-semibold text-lg">Academic Record Assessment</h2>
+            <button className="border px-4 py-2 rounded">Complete Academic Record Assessment</button>
             </div>
         </section>
 

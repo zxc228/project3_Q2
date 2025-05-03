@@ -68,23 +68,41 @@ class AuthService {
       const existing = await pool.query(checkQuery, [user.id]);
 
       if (existing.rowCount === 0) {
-        await pool.query(`
-          INSERT INTO "Profile" 
-          (id, userid, firstname, lastname, degreeid, graduationyear, bio)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `, [
-          profileId,
-          user.id,
-          user.id,       // firstname
-          'Doe',         // lastname
-          degreeId,      // default
-          2026,
-          'Auto-generated profile'
-        ]);
-
-        console.log(`🟢 Profile created for user ${user.id}`);
+        // только если у студента есть degreeId
+        if (user.role === 'student' && user.studies) {
+          await pool.query(`
+            INSERT INTO "Profile" 
+            (id, userid, firstname, lastname, degreeid, graduationyear, bio)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `, [
+            profileId,
+            user.id,
+            user.id,
+            'Doe',
+            user.studies,
+            2026,
+            'Auto-generated profile'
+          ]);
+      
+          console.log(`🟢 Profile created for student ${user.id}`);
+        } else if (user.role === 'teacher') {
+          await pool.query(`
+            INSERT INTO "Profile" 
+            (id, userid, firstname, lastname, graduationyear, bio)
+            VALUES ($1, $2, $3, $4, $5, $6)
+          `, [
+            profileId,
+            user.id,
+            user.id,
+            'Doe',
+            2026,
+            'Auto-generated profile (teacher)'
+          ]);
+      
+          
+        }
       }
-
+      
   
       return { user: userData, token };
   

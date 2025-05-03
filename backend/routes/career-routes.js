@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-;
-
+const pool = require('../config/db');
+const PDFDocument = require("pdfkit");
+const { Readable } = require("stream");
 
 /**
  * career routes implementation
@@ -104,7 +105,81 @@ module.exports = function(services) {
     }
   });
   
-  
 
+  router.get('/types/:careerTypeId/description', async (req, res, next) => {
+    const { careerTypeId } = req.params;
+
+    try {
+      const query = `
+        SELECT description
+        FROM "CareerType"
+        WHERE id = $1
+      `;
+      const result = await pool.query(query, [careerTypeId]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Career type not found' });
+      }
+
+      return res.json({ description: result.rows[0].description });
+    } catch (error) {
+      console.error('DB Error:', error);
+      next(error);
+    }
+  });
+  /**
+ * POST /api/careers/report
+ * Получает массив topRecommendations и возвращает PDF отчёт
+ */
+  router.post("/report", async (req, res, next) => {
+    const { topRecommendations } = req.body;
+
+    if (!Array.isArray(topRecommendations) || topRecommendations.length === 0) {
+      return res.status(400).json({ error: "Missing or invalid topRecommendations array" });
+    }
+
+    try {
+      const doc = new PDFDocument();
+
+      // Прокинуть PDF как stream
+      const stream = new Readable();
+      stream._read = () => {};
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", "attachment; filename=career_report.pdf");
+      doc.pipe(res);
+
+      doc.fontSize(18).text("Career Recommendation Report", { align: "center" });
+      doc.moveDown(1);
+
+      topRecommendations.forEach((rec, index) => {
+        doc.fontSize(14).fillColor("black").text(`${index + 1}. ${rec.careerFieldName} (${rec.careerType})`, {
+          underline: true,
+        });
+
+        doc.fontSize(12).fillColor("gray").text(`Fitness Score: ${(rec.fitnessScore / 5 * 100).toFixed(1)}%`, {
+          indent: 10,
+        });
+
+        doc.fontSize(12).fillColor("black").text("Skills:", { indent: 10 });
+
+        rec.skillAssessments.forEach(skill => {
+          doc
+            .fontSize(11)
+            .text(`- ${skill.skillName}: Current ${skill.currentLevel}, Importance ${skill.importanceLevel}, Gap ${skill.gap}`, {
+              indent: 20,
+            });
+        });
+
+        doc.moveDown(1);
+      });
+
+      doc.end();
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      next(err);
+    }
+  });
+
+  
   return router;
 };

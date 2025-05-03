@@ -73,7 +73,8 @@ export default function Login() {
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Login failed");
+        toast.error(data.error?.message || data.error || "Login failed");
+
         
       } else {
         toast.success("Login successful");
@@ -81,8 +82,12 @@ export default function Login() {
         const nameRaw = data.user.id;
         const profileId = "profile_" + nameRaw.trim().toLowerCase().replace(/\s+/g, "_");
         localStorage.setItem("profileId", profileId);
-
-        router.push("/dashboard");
+        console.log("data", data);
+        if (data.user.role === "TEACHER") {
+          router.push("/tutor-profile");
+        } else {
+          router.push("/dashboard");
+        }
     
       }
     }
@@ -129,15 +134,9 @@ export default function Login() {
             What is U-TAD Path Finder (U-PaFi)?
           </h1>
           <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
-            Lorem ipsum dolor sit amet consectetur. Ut nec pretium feugiat
-            aliquet egestas. Ac sed ultricies purus dui feugiat tincidunt orci.
-            Sit dictumst lectus est lectus laoreet.
+          U-PaFi is a career guidance platform that helps U-TAD students identify the best career paths based on their grades and skills. We recommend personalized career tracks, show which skills to focus on, and generate reports to share with your tutor. Plan your professional future and improve your employability with U-PaFi!.
           </p>
-          <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
-            Lorem ipsum dolor sit amet consectetur. Ut nec pretium feugiat
-            aliquet egestas. Ac sed ultricies purus dui feugiat tincidunt orci.
-            Sit dictumst lectus est lectus laoreet.
-          </p>
+          
 
           <div className="flex justify-center mt-4">
             <Image

@@ -13,8 +13,7 @@ class ProfileService {
   async getCompleteProfile(profileId) {
     try {
       // getting base profile data
-     
-      console.log('Profile:', profile);
+      const profile = await this.profileDAO.getProfileById(profileId);
       if (!profile) {
         throw new Error('Profile not found');
       }
