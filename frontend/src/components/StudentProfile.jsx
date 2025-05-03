@@ -1,10 +1,19 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function StudentProfile() {
+
+  const router = useRouter();
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+      }
+    }, []);
   const [userData, setUserData] = useState({
     name: "Nombre Apellidos",
     location: "Location",
@@ -13,10 +22,11 @@ export default function StudentProfile() {
     link: "mylink.com",
   });
 
-  // name: English, level: B2
   const [languages, setLanguages] = useState([]);
-
   const [aboutMe, setAboutMe] = useState("");
+  const [experience, setExperience] = useState([]);
+  const [profileId, setProfileId] = useState(null);
+  const [token, setToken] = useState(null);
 
   const skills = [
     "Data Mining",
@@ -31,10 +41,6 @@ export default function StudentProfile() {
   for (let i = 0; i < skills.length; i += 2) {
     skillPairs.push([skills[i], skills[i + 1]]);
   }
-
-  // title: Data Analyst Intern, company: Tech Company, date: July 2023 – present,
-  // description: Lorem ipsum dolor sit amet consectetur.
-  const [experience, setExperience] = useState([]);
 
   let CVUploaded = false;
 
@@ -67,13 +73,75 @@ export default function StudentProfile() {
     // Handle the academic record upload logic here
   };
 
-  const handleSaveChanges = () => {
-    // Save changes logic here, calling the route, Ilya your work!
-    console.log("Changes saved:", userData, languages, aboutMe, experience);
+  useEffect(() => {
+    const storedProfileId = localStorage.getItem('profileId');
+    const storedToken = localStorage.getItem('token');
+
+    setProfileId(storedProfileId);
+    setToken(storedToken);
+  }, []);
+
+  // Function to fetch profile data
+  const retrieveUserData = async () => {
+    try {
+      const response = await fetch(`/api/profiles/profile/${profileId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching profile data: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const profileData = data.profile.profile_data;
+
+      setUserData(profileData.userData || {});
+      setLanguages(profileData.languages || []);
+      setAboutMe(profileData.aboutMe || "");
+      setExperience(profileData.experience || []);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  // Calling this method will ask for database data
-  const retrieveUserData = async () => {};
+  // Function to save profile changes
+  const handleSaveChanges = async () => {
+    const profileData = {
+      userData,
+      languages,
+      aboutMe,
+      experience,
+    };
+
+    try {
+      const response = await fetch(`/api/profiles/profile/${profileId}/profile-data`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error updating profile data: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Profile updated successfully:", data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (profileId && token) {
+      retrieveUserData();
+    }
+  }, [profileId, token]);
 
   // Calculate the completion percentage based on completed steps, user should have modified default values
   if (
@@ -135,7 +203,10 @@ export default function StudentProfile() {
             </Link>
           </nav>
         </div>
-        <button className="text-white font-bold text-[18px] text-left">
+        <button onClick={() => {
+            localStorage.clear(); 
+            router.push("/"); 
+          }} className="text-white font-bold text-[18px] text-left">
           Sign out
         </button>
       </aside>

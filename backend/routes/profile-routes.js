@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { academicRecordUpload, cvUpload } = require('../config/file-storage');
+const pool = require('../config/db');
 
 
 /**
@@ -94,6 +95,7 @@ module.exports = function(services) {
       res.json(completeProfile);
     } catch (error) {
       if (error.message === 'Profile not found') {
+        
         return res.status(404).json({ error: 'Profile not found' });
       }
       next(error);
@@ -244,6 +246,46 @@ module.exports = function(services) {
         return res.status(404).json({ error: 'Profile not found' });
       }
       next(error);
+    }
+  });
+
+
+  //  emergency get route
+  router.get('/profile/:id', async (req, res) => {
+    const profileId = req.params.id;
+  
+    try {
+      const result = await pool.query('SELECT * FROM "Profile" WHERE id = $1', [profileId]);
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Profile not found' });
+      }
+  
+      return res.json({ profile: result.rows[0] });
+    } catch (error) {
+      console.error('[DEBUG ROUTE ERROR]', error);
+      return res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+  });
+  // emergency POST route — update profile_data JSON
+  router.post('/profile/:id/profile-data', async (req, res) => {
+    const profileId = req.params.id;
+    const profileData = req.body;
+
+    try {
+      const result = await pool.query(
+        'UPDATE "Profile" SET profile_data = $1 WHERE id = $2 RETURNING *',
+        [profileData, profileId]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Profile not found' });
+      }
+
+      return res.json({ updatedProfile: result.rows[0] });
+    } catch (error) {
+      console.error('[DEBUG UPDATE ERROR]', error);
+      return res.status(500).json({ error: 'Internal server error', details: error.message });
     }
   });
 

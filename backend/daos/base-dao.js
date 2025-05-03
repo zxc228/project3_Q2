@@ -33,7 +33,7 @@ class BaseDAO {
 
   // finding records by a specific field value
   async findByField(table, field, value) {
-    const query = `SELECT * FROM "${table}" WHERE "${field}" = $1`;
+    const query = `SELECT * FROM "${table}" WHERE ${field} = $1`;
     return await this.query(query, [value]);
   }
 
