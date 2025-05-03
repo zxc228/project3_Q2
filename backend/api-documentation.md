@@ -1229,7 +1229,7 @@ Returns all skills required for a specific career type.
 
 Returns career recommendations for a profile, optionally filtered by field or type.
 
-**URL:** `/api/profiles/:id/recommendations`  
+**URL:** `/api/careers/profiles/:id/recommendations`  
 **Method:** `GET`  
 **Auth Required:** Yes  
 **URL Params:** `id=[string]` (Profile ID)  
@@ -1278,7 +1278,7 @@ Returns career recommendations for a profile, optionally filtered by field or ty
 
 Returns a detailed assessment for a specific career path.
 
-**URL:** `/api/profiles/:id/recommendations/:careerTypeId`  
+**URL:** `/api/careers/profiles/:id/recommendations/:careerTypeId`  
 **Method:** `GET`  
 **Auth Required:** Yes  
 **URL Params:** 
@@ -1333,7 +1333,7 @@ Returns a detailed assessment for a specific career path.
 
 Returns a list of all reports generated for a profile.
 
-**URL:** `/api/profiles/:id/reports`  
+**URL:** `/api/reports/profiles/:id/reports`  
 **Method:** `GET`  
 **Auth Required:** Yes  
 **URL Params:** `id=[string]` (Profile ID)
