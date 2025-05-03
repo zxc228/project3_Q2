@@ -107,8 +107,8 @@ The API is organized around several main parts: Authentication, Profiles, Skills
 | `/api/careers/fields` | GET | List all career fields |
 | `/api/careers/fields/:id/types` | GET | Get career types for a field |
 | `/api/careers/skills/:careerTypeId` | GET | Get skills for a career type |
-| `/api/profiles/:id/recommendations` | GET | Get career recommendations |
-| `/api/profiles/:id/recommendations/:careerTypeId` | GET | Get specific career assessment |
+| `/api/careers/profiles/:id/recommendations` | GET | Get career recommendations |
+| `/api/careers/profiles/:id/recommendations/:careerTypeId` | GET | Get specific career assessment |
 
 ### Reports
 
@@ -117,7 +117,7 @@ The API is organized around several main parts: Authentication, Profiles, Skills
 | `/api/profiles/:id/reports` | GET | List reports for a profile |
 | `/api/reports/:id` | GET | Get report details |
 | `/api/reports` | POST | Create a new report |
-| `/api/profiles/:id/save-recommendation` | POST | Save career recommendation |
+| `/api/reports/profiles/:id/save-recommendation` | POST | Save career recommendation |
 | `/api/reports/:reportId/assessments/:id` | PUT | Update assessment |
 | `/api/reports/:id/pdf` | GET | Generate PDF for a report |
 
