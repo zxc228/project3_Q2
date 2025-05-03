@@ -80,13 +80,14 @@ function calculateCareerFitness(userSkills, careerSkills, careerField, careerTyp
   
   // calculating skill assessments
   const skillAssessments = careerSkills.map(careerSkill => {
-    const currentLevel = userSkillMap.get(careerSkill.skillId) || 0;
-    const importanceLevel = careerSkill.importanceLevel;
+    const skillId = careerSkill.skillid || careerSkill.skillId;
+    const currentLevel = userSkillMap.get(careerSkill.skillid) || 0;
+    const importanceLevel = careerSkill.importancelevel;
     const gap = Math.max(0, importanceLevel - currentLevel);
     
     return {
-      skillId: careerSkill.skillId,
-      skillName: skillNameMap.get(careerSkill.skillId) || 'Unknown Skill',
+      skillId,
+      skillName: skillNameMap.get(careerSkill.skillid) || 'Unknown Skill',
       currentLevel,
       importanceLevel,
       gap
@@ -99,6 +100,7 @@ function calculateCareerFitness(userSkills, careerSkills, careerField, careerTyp
   
   // converting to fitness score (inverting the gap, so 0 gap = 5 fitness, 5 gap = 0 fitness)
   const fitnessScore = 5 - averageGap;
+ 
   
   return {
     careerFieldId: careerField.id,
@@ -132,6 +134,8 @@ function recommendCareers(
   filterType
 ) {
   const recommendations = [];
+  console.log('\nCareerSkills Sample:', careerSkills.slice(0, 3));
+
   
   // filtering career fields if specified
   const fieldsToCheck = filterFieldId ? 
@@ -141,16 +145,18 @@ function recommendCareers(
   // checking each relevant career field
   fieldsToCheck.forEach(careerField => {
     // getting career types for this field, filtered if necessary
-    const typesForField = careerTypes
-      .filter(type => type.careerFieldId === careerField.id)
-      .filter(type => filterType ? type.type === filterType : true);
     
+    const typesForField = careerTypes
+      .filter(type => type.careerfieldid === careerField.id)
+      .filter(type => filterType ? type.type === filterType : true);
+
     // calculating fitness for each type
     typesForField.forEach(careerType => {
       // getting skills for this career type
       const relevantCareerSkills = careerSkills.filter(
-        skill => skill.careerTypeId === careerType.id
+        skill => skill.careertypeid === careerType.id
       );
+      
       
       // calculating fitness
       const recommendation = calculateCareerFitness(
@@ -160,13 +166,26 @@ function recommendCareers(
         careerType,
         allSkills
       );
-      
+      console.log(`\nEvaluating ${careerType.type} in ${careerField.name}`);
+      console.log('CareerType ID:', careerType.id);
+      console.log('Relevant career skills:', relevantCareerSkills.map(s => ({
+        skillId: s.skillId,
+        importance: s.importanceLevel
+      })));
+      console.log('User skills for relevant skills:', userSkills.filter(s => relevantCareerSkills.find(r => r.skillId === s.skillId)));
+
       recommendations.push(recommendation);
     });
   });
   
   // sorting by fitness score (highest first)
+  console.log('\n--- FINAL RECOMMENDATIONS ---');
+  recommendations.forEach(r => {
+    console.log(`${r.careerType} in ${r.careerFieldName}: fitness = ${r.fitnessScore.toFixed(2)}`);
+  });
+
   return recommendations.sort((a, b) => b.fitnessScore - a.fitnessScore);
+  
 }
 
 module.exports = {

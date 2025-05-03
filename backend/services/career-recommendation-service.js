@@ -14,13 +14,14 @@ class CareerRecommendationService {
   }
 
   // converting profile skills to the required format -- it is needed for the recommendation algorithm
-  _formatProfileSkills(profileSkills) {
-    return profileSkills.map(skill => ({
-      skillId: skill.skillId,
-      skillName: skill.skillName || '',
-      currentLevel: skill.skillLevel
+  _formatProfileSkills(skills) {
+    return skills.map(skill => ({
+      skillId: skill.skillid,
+      skillName: skill.skillname,
+      currentLevel: parseFloat(skill.skilllevel) || 0
     }));
   }
+  
 
   // getting recommendations for a specific career
   async getSpecificCareerRecommendation(profileId, careerTypeId) {
