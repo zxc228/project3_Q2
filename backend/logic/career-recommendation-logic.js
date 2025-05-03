@@ -134,7 +134,7 @@ function recommendCareers(
   filterType
 ) {
   const recommendations = [];
-  console.log('\nCareerSkills Sample:', careerSkills.slice(0, 3));
+  
 
   
   // filtering career fields if specified
@@ -166,14 +166,7 @@ function recommendCareers(
         careerType,
         allSkills
       );
-      console.log(`\nEvaluating ${careerType.type} in ${careerField.name}`);
-      console.log('CareerType ID:', careerType.id);
-      console.log('Relevant career skills:', relevantCareerSkills.map(s => ({
-        skillId: s.skillId,
-        importance: s.importanceLevel
-      })));
-      console.log('User skills for relevant skills:', userSkills.filter(s => relevantCareerSkills.find(r => r.skillId === s.skillId)));
-
+      
       recommendations.push(recommendation);
     });
   });

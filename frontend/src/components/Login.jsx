@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 import Explanation from "./Explanation";
+import { toast } from 'react-hot-toast';
 
 export default function Login() {
   const router = useRouter();
@@ -72,11 +73,12 @@ export default function Login() {
 
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "Login failed");
+        toast.error(data.error || "Login failed");
+        
       } else {
-        alert("Login successful");
+        toast.success("Login successful");
         localStorage.setItem("token", data.token);
-        const nameRaw = data.user.id; // "Ilya Istomin"
+        const nameRaw = data.user.id;
         const profileId = "profile_" + nameRaw.trim().toLowerCase().replace(/\s+/g, "_");
         localStorage.setItem("profileId", profileId);
 

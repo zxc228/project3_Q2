@@ -13,7 +13,13 @@ export default function Assessment() {
     return "";
   }
   
-  const router = useRouter();   
+  const router = useRouter(); 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+    }
+  }, []);  
   // ────────────────────────── state
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -29,6 +35,8 @@ export default function Assessment() {
     justifications: [],
   });
 
+  
+  
   // ────────────────────────── fetch career fields (один раз)
   useEffect(() => {
     (async () => {

@@ -1,37 +1,71 @@
 "use client";
-import { useState, React } from "react";
+import { useState, React, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
+  
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("progress");
 
   const router = useRouter();
-
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+    }
+  }, []);
   const handleClick = () => {
     router.push("/assessment");
   };
 
-  const careerTracks = [
-    "I DON'T KNOW WHERE I WANT TO",
-    "DATA",
-    "WEB DEVELOPMENT",
-    "CYBERSECURITY",
-    "AI & MACHINE LEARNING",
-  ];
-  const skills = [
-    { name: "Data Mining", current: 5, desired: 5 },
-    { name: "Data Visualization", current: 4, desired: 5 },
-    { name: "Data Cleaning", current: 3.5, desired: 2 },
-    { name: "Python", current: 3, desired: 3 },
-    { name: "SQL", current: 3.5, desired: 4 },
-    { name: "Big Data Processing Framework", current: 2, desired: 2 },
-    { name: "Tableau", current: 3, desired: 3.5 },
-    { name: "Machine Learning", current: 3, desired: 5 },
-    { name: "Matlab", current: 2, desired: 3 },
-  ];
+  const [careerTracks, setCareerTracks] = useState([]);
+  const [skills, setSkills] = useState([]);
+
+  const [recommendations, setRecommendations] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const profileId = localStorage.getItem("profileId");
+
+    if (!token) {
+      router.push("/");
+      return;
+    }
+    console.log("profileId", profileId);  
+    fetch(`/api/careers/profiles/${profileId}/recommendations`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        const top = data.topRecommendations;
+
+        setRecommendations(top);
+
+        const trackNames = top.map(r => ({
+          label: `${r.careerFieldName} (${r.careerType})`,
+          id: r.careerTypeId,
+        }));
+        setCareerTracks(trackNames);
+        setSelectedTrack(trackNames[0].id);
+
+        // изначально показать навыки первого трека
+        const initial = top.find(r => r.careerFieldName === trackNames[0]);
+        if (initial) {
+          const s = initial.skillAssessments.map(skill => ({
+            name: skill.skillName,
+            current: skill.currentLevel,
+            desired: skill.currentLevel + (skill.gap || 0),
+          }));
+          setSkills(s);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
 
   const [courses, setCourses] = useState([
     { id: 1, expanded: true },
@@ -63,7 +97,13 @@ const Dashboard = () => {
             <li className="mb-2 cursor-pointer font-bold">Dashboard</li>  
           </ul>
         </nav>
-        <button className="mt-auto border border-white px-4 py-2">
+        <button
+          onClick={() => {
+            localStorage.clear(); 
+            router.push("/"); 
+          }}
+          className="mt-auto border border-white px-4 py-2"
+        >
           Sign out
         </button>
       </aside> 
@@ -95,23 +135,36 @@ const Dashboard = () => {
               <h2 className="font-semibold text-lg">Career Track:</h2>
               <select
                 value={selectedTrack}
-                onChange={(e) => setSelectedTrack(e.target.value)}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  setSelectedTrack(selectedId);
+                  const found = recommendations.find(r => r.careerTypeId === selectedId);
+                  if (found) {
+                    const newSkills = found.skillAssessments.map(skill => ({
+                      name: skill.skillName,
+                      current: skill.currentLevel,
+                      desired: skill.currentLevel + (skill.gap || 0),
+                    }));
+                    setSkills(newSkills);
+                  }
+                }}
                 className="border rounded px-2 py-1 text-blue-600 font-semibold"
               >
                 {careerTracks.map((track) => (
-                  <option key={track} value={track}>{track}</option>
+                  <option key={track.id} value={track.id}>{track.label}</option>
                 ))}
               </select>
+
             </div>
             <button className="border px-4 py-2 rounded text-sm font-semibold">Generate PDF</button>
           </div>
 
-          <p className="text-sm text-gray-600 mb-2">
+          {/* <p className="text-sm text-gray-600 mb-2">
             A data analyst collects, processes, and analyzes data to help organizations make informed decisions. They use tools and techniques to identify trends, patterns, and insights in data.
           </p>
           <p className="text-sm text-gray-600 mb-4">
             If you enjoy working with numbers, problem-solving, and making sense of data, this field could be a great fit!
-          </p>
+          </p> */}
 
           <div className="flex justify-between items-center mb-1">
             <h3 className="font-semibold mb-1">Skills</h3>
@@ -147,16 +200,25 @@ const Dashboard = () => {
             ))}
           </ul>
 
-          <p className="text-xs text-gray-500 mt-3">Improve a skill to level 3 to obtain a badge!</p>
+          {/* <p className="text-xs text-gray-500 mt-3">Improve a skill to level 3 to obtain a badge!</p> */}
         </section>
 
 
         {/* Self Assessment placeholder */}
         <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
+            <h2 className="font-semibold text-lg">Expedientes Académicos Assessment</h2>
+            <button className="border px-4 py-2 rounded">Complete Expedientes Académicos Assessment</button>
+            </div>
+        </section>
+
+
+
+        <section className="bg-white p-6 shadow rounded mb-6">
+          <div className="flex justify-between items-center">
             <h2 className="font-semibold text-lg">Self-Assessment</h2>
             <button onClick={handleClick} className="border px-4 py-2 rounded">Complete Self-Assessment</button>
-
+{/* 
           </div>
           <div className="mt-4">
             <div className="bg-gray-200 p-4 rounded mb-2 flex justify-between items-center">
@@ -190,10 +252,10 @@ const Dashboard = () => {
                   <span className="material-icons">⬇️</span>
                 </button>
               </div>
-            </div>
-            <button className="mx-auto block border px-4 py-2 rounded bg-white">
+            </div> */}
+            {/* <button className="mx-auto block border px-4 py-2 rounded bg-white">
               See More
-            </button>
+            </button> */}
           </div>
         </section>
 
