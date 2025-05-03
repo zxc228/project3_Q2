@@ -93,6 +93,7 @@ module.exports = function(services) {
       next(error);
     }
   });
+  
   router.get('/skills/:careerTypeId', async (req, res, next) => {
     try {
       const { careerTypeId } = req.params;
