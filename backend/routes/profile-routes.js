@@ -289,5 +289,36 @@ module.exports = function(services) {
     }
   });
 
+
+  // POST /api/profiles/user/email
+    router.post('/user/email', async (req, res) => {
+      const { userId } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'Missing userId' });
+      }
+
+      try {
+        const result = await pool.query(
+          'SELECT email FROM "User" WHERE id = $1',
+          [userId]
+        );
+
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.json({ email: result.rows[0].email });
+      } catch (error) {
+        console.error('[DEBUG USER EMAIL ERROR]', error);
+        return res.status(500).json({
+          error: 'Internal server error',
+          details: error.message,
+        });
+      }
+    });
+
+
+
   return router;
 };

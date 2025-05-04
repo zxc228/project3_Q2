@@ -78,6 +78,7 @@ export default function Login() {
         
       } else {
         toast.success("Login successful");
+        localStorage.setItem("userId", data.user.id);
         localStorage.setItem("token", data.token);
         const nameRaw = data.user.id;
         const profileId = "profile_" + nameRaw.trim().toLowerCase().replace(/\s+/g, "_");
