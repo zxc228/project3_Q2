@@ -130,56 +130,91 @@ module.exports = function(services) {
   });
   /**
  * POST /api/careers/report
- * Получает массив topRecommendations и возвращает PDF отчёт
+ * Получает элемент массива topRecommendations и возвращает PDF отчёт и имя
  */
-  router.post("/report", async (req, res, next) => {
-    const { topRecommendations } = req.body;
+  const { Readable } = require("stream");
+const PDFDocument = require("pdfkit");
+const pool = require("../config/db");
 
-    if (!Array.isArray(topRecommendations) || topRecommendations.length === 0) {
-      return res.status(400).json({ error: "Missing or invalid topRecommendations array" });
+router.post("/report", async (req, res, next) => {
+  const { topRecommendations, profileId } = req.body;
+
+  if (
+    !Array.isArray(topRecommendations) ||
+    topRecommendations.length === 0 ||
+    !profileId
+  ) {
+    return res.status(400).json({
+      error: "Missing or invalid topRecommendations array or profileId",
+    });
+  }
+
+  try {
+    // 🟢 Получаем userId по profileId
+    const profileRes = await pool.query(
+      `SELECT userid FROM "Profile" WHERE id = $1`,
+      [profileId]
+    );
+
+    if (profileRes.rows.length === 0) {
+      return res.status(404).json({ error: "Profile not found" });
     }
 
-    try {
-      const doc = new PDFDocument();
+    const userId = profileRes.rows[0].userid;
 
-      // Прокинуть PDF как stream
-      const stream = new Readable();
-      stream._read = () => {};
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", "attachment; filename=career_report.pdf");
-      doc.pipe(res);
+    // 🧾 Создание PDF
+    const doc = new PDFDocument();
 
-      doc.fontSize(18).text("Career Recommendation Report", { align: "center" });
-      doc.moveDown(1);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${userId}_career_report.pdf`
+    );
+    doc.pipe(res);
 
-      topRecommendations.forEach((rec, index) => {
-        doc.fontSize(14).fillColor("black").text(`${index + 1}. ${rec.careerFieldName} (${rec.careerType})`, {
+    doc.fontSize(18).text("Career Recommendation Report", { align: "center" });
+    doc.moveDown(0.5);
+    doc.fontSize(14).text(`Name: ${userId}`, { align: "left" });
+    doc.moveDown(1);
+
+    topRecommendations.forEach((rec, index) => {
+      doc
+        .fontSize(14)
+        .fillColor("black")
+        .text(`${index + 1}. ${rec.careerFieldName} (${rec.careerType})`, {
           underline: true,
         });
 
-        doc.fontSize(12).fillColor("gray").text(`Fitness Score: ${(rec.fitnessScore / 5 * 100).toFixed(1)}%`, {
+      doc
+        .fontSize(12)
+        .fillColor("gray")
+        .text(`Fitness Score: ${(rec.fitnessScore / 5) * 100}%`, {
           indent: 10,
         });
 
-        doc.fontSize(12).fillColor("black").text("Skills:", { indent: 10 });
+      doc.fontSize(12).fillColor("black").text("Skills:", { indent: 10 });
 
-        rec.skillAssessments.forEach(skill => {
-          doc
-            .fontSize(11)
-            .text(`- ${skill.skillName}: Current ${skill.currentLevel}, Importance ${skill.importanceLevel}, Gap ${skill.gap}`, {
+      rec.skillAssessments.forEach((skill) => {
+        doc
+          .fontSize(11)
+          .text(
+            `- ${skill.skillName}: Current ${skill.currentLevel}, Importance ${skill.importanceLevel}, Gap ${skill.gap}`,
+            {
               indent: 20,
-            });
-        });
-
-        doc.moveDown(1);
+            }
+          );
       });
 
-      doc.end();
-    } catch (err) {
-      console.error("PDF generation error:", err);
-      next(err);
-    }
-  });
+      doc.moveDown(1);
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    next(err);
+  }
+});
+
 
   
   return router;

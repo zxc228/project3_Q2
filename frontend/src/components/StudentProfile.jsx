@@ -416,7 +416,7 @@ export default function StudentProfile() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col">
+        {/* <div className="mt-10 flex flex-col">
           <div className="w-full border rounded-md p-4 border-custom-utad-logo">
             <p className="font-bold mb-4 text-[28px]">Skills</p>
             <div className="flex flex-col gap-4">
@@ -515,7 +515,16 @@ export default function StudentProfile() {
         </div>
         <button className="bg-custom-utad-logo text-[#E5E9EC] font-bold px-10 py-4 rounded-md text-[28px] mt-10 w-full mb-10">
           Improve your profile
-        </button>
+        </button> */}
+        <div className="mt-10 w-full border rounded-md p-6 border-dashed border-gray-400 text-center">
+          <p className="text-[22px] font-bold text-gray-500 mb-2">
+            Additional profile sections coming soon
+          </p>
+          <p className="text-gray-500 text-[16px]">
+            Skills, experience, and more will be available in upcoming updates.
+          </p>
+        </div>
+
       </div>
     </div>
   );

@@ -1,226 +1,266 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-export default function StudentProfile() {
-  const [userData, setUserData] = useState({
-    name: "Nombre Apellidos",
-    location: "Location",
-    degree: "Degree Taught",
-    year: "Years of experience",
-    link: "mylink.com",
-  });
+export default function TutorProfile() {
+  const router = useRouter();
+  const [selectedStudent, setSelectedStudent] = useState("");
+  const [students, setStudents] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
-  // name: English, level: B2
-  const [languages, setLanguages] = useState([]);
+  const [careerTracks, setCareerTracks] = useState([]);
+  const [selectedTrack, setSelectedTrack] = useState("");
+  const [selectedDescription, setSelectedDescription] = useState("");
+  const [selectedFitness, setSelectedFitness] = useState("");
+  const [skills, setSkills] = useState([]);
 
-  const [aboutMe, setAboutMe] = useState("");
+  const loadDescription = async (careerTypeId) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  let CVUploaded = false;
-
-  const cvInputRef = useRef(null);
-
-  const uploadCV = () => {
-    cvInputRef.current?.click();
+    try {
+      const res = await fetch(`/api/careers/types/${careerTypeId}/description`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setSelectedDescription(data.description || "No description available.");
+    } catch (err) {
+      console.error("Failed to fetch description", err);
+    }
   };
 
-  const handleCVChange = (e) => {
-    const file = e.target.files[0];
-    // Handle the CV upload logic here
-  };
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("/api/tutors/all-students", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStudents(response.data);
+        if (response.data.length > 0) {
+          setSelectedStudent(response.data[0].profileId);
+        }
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    };
 
-  const handleSaveChanges = () => {
-    // Save changes logic here, calling the route, Ilya your work!
-    console.log("Changes saved:", userData, languages, aboutMe);
-  };
+    fetchStudents();
+  }, []);
 
-  // Calling this method will ask for database data
-  const retrieveUserData = async () => {};
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!selectedStudent) return;
+
+      const token = localStorage.getItem("token");
+      try {
+        const res = await fetch(`/api/careers/profiles/${selectedStudent}/recommendations`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setRecommendations(data.topRecommendations || []);
+
+        const trackNames = data.topRecommendations.map(r => ({
+          label: `${r.careerFieldName} (${r.careerType})`,
+          id: r.careerTypeId,
+        }));
+        setCareerTracks(trackNames);
+
+        if (trackNames.length > 0) {
+          setSelectedTrack(trackNames[0].id);
+          loadDescription(trackNames[0].id);
+
+          const initial = data.topRecommendations[0];
+          const firstFitness = Math.round((initial.fitnessScore / 5) * 100);
+          setSelectedFitness(`${firstFitness}%`);
+
+          const s = initial.skillAssessments.map(skill => ({
+            name: skill.skillName,
+            current: skill.currentLevel,
+            desired: skill.currentLevel + (skill.gap || 0),
+          }));
+          setSkills(s);
+        }
+      } catch (err) {
+        console.error("Error loading recommendations", err);
+      }
+    };
+
+    fetchRecommendations();
+  }, [selectedStudent]);
 
   return (
     <div className="flex h-screen font-montserrat">
       <aside className="bg-custom-utad-logo w-[345px] fixed h-full flex flex-col justify-between py-10 px-6">
         <div>
-          <Image src="/u-tad-nobg.png" width={160} height={50} alt="Logo" />
-          <nav className="mt-20 space-y-6 flex flex-col">
-            <Link
-              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
-              href={"/student-profile"}
-            >
-              <Image
-                src={"/svg/Profile.svg"}
-                width={25}
-                height={25}
-                alt="Profile Link"
-              />
-              <span>Profile</span>
-            </Link>
-            <Link
-              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
-              href={"/dashboard"}
-            >
-              <Image
-                src={"/svg/Dashboard.svg"}
-                width={25}
-                height={25}
-                alt="Dashboard Link"
-              />
-              <span>Dashboard</span>
-            </Link>
-          </nav>
+          <h1 className="text-white font-bold text-[24px]">Tutor Profile</h1>
         </div>
-        <button className="text-white font-bold text-[18px] text-left">
+        <button
+          onClick={() => {
+            localStorage.clear();
+            router.push("/");
+          }}
+          className="text-white font-bold text-[18px] text-left"
+        >
           Sign out
         </button>
       </aside>
-
+  
       <div className="ml-[345px] w-full px-10 py-10">
-        <section className="flex justify-between items-center mb-8">
+        <section className="mb-8">
           <div className="flex items-center gap-6">
-            <div className="bg-gray-200 p-4 rounded-lg">
-              <Image
-                src="/default-icon.png"
-                width={80}
-                height={80}
-                alt="Avatar"
-              />
-            </div>
             <div className="flex flex-col">
-              <input
-                className="text-[32px] font-bold w-[600px] focus:outline-none"
-                value={userData.name}
-                placeholder="Name Surnames"
-                onChange={(e) =>
-                  setUserData({ ...userData, name: e.target.value })
-                }
-              />
-              <input
-                className="text-[21px] font-600 text-custom-utad-logo focus:outline-none"
-                value={userData.location}
-                placeholder="Madrid, Spain"
-                onChange={(e) =>
-                  setUserData({ ...userData, location: e.target.value })
-                }
-              />
+              <h1 className="text-[32px] font-bold">Career Recommendations</h1>
+              <div className="mt-4">
+                <label className="block font-semibold mb-2">Select Student:</label>
+                <select
+                  value={selectedStudent}
+                  onChange={(e) => setSelectedStudent(e.target.value)}
+                  className="border rounded px-3 py-2"
+                >
+                  {students.map((student) => (
+                    <option key={student.profileId} value={student.profileId}>
+                      {student.userId} — {student.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col">
-            <button className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px]">
-              SHARE PROFILE
-            </button>
-            <button
-              className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px] mt-5"
-              onClick={handleSaveChanges}
-            >
-              SAVE CHANGES
-            </button>
-          </div>
         </section>
-
-        <section className="space-y-1 text-custom-gray text-[21px] font-bold mb-10 flex flex-col">
-          <input
-            className="focus:outline-none"
-            value={userData.degree}
-            placeholder="Teaching Degree"
-            onChange={(e) =>
-              setUserData({ ...userData, degree: e.target.value })
-            }
-          />
-          <input
-            className="focus:outline-none"
-            value={userData.year}
-            placeholder="Years of experience"
-            onChange={(e) => setUserData({ ...userData, year: e.target.value })}
-          />
-          <input
-            className="focus:outline-none"
-            value={userData.link}
-            placeholder="mylink.com"
-            onChange={(e) => setUserData({ ...userData, link: e.target.value })}
-          />
-        </section>
-
-        <div className="mt-10 w-full border rounded-md p-4 border-custom-utad-logo">
-          <p className="font-bold mb-4 text-[21px] text-custom-gray">
-            About me...
-          </p>
-          <div className="text-[18px] font-400">
-            <textarea
-              className="w-full focus:outline-none resize-none"
-              rows={5}
-              value={aboutMe}
-              onChange={(e) => setAboutMe(e.target.value)}
-              placeholder="Write something about yourself..."
-            />
-          </div>
-        </div>
-
-        <div className="mt-10 flex gap-6">
-          <div className="w-1/4 border rounded-md p-4 border-custom-utad-logo">
-            <p className="font-bold mb-4 text-[28px]">I speak...</p>
-            {languages.map((lang, index) => (
-              <div key={index} className="mb-4">
-                <input
-                  className="font-bold text-[24px] w-full border-b border-gray-300 focus:outline-none mb-1"
-                  placeholder="Language"
-                  value={lang.name}
+  
+        {recommendations.length > 0 && (
+          <section className="bg-white p-6 shadow rounded mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-lg">Career Track:</h2>
+                <select
+                  value={selectedTrack}
                   onChange={(e) => {
-                    const updated = [...languages];
-                    updated[index].name = e.target.value;
-                    setLanguages(updated);
+                    const selectedId = e.target.value;
+                    setSelectedTrack(selectedId);
+                    loadDescription(selectedId);
+  
+                    const found = recommendations.find(
+                      (r) => r.careerTypeId === selectedId
+                    );
+                    if (found) {
+                      setSelectedFitness(
+                        `${Math.round((found.fitnessScore / 5) * 100)}%`
+                      );
+                      setSkills(
+                        found.skillAssessments.map((skill) => ({
+                          name: skill.skillName,
+                          current: skill.currentLevel,
+                          desired: skill.currentLevel + (skill.gap || 0),
+                        }))
+                      );
+                    }
                   }}
-                />
-                <input
-                  className="text-[16px] font-bold text-custom-gray w-full border-b border-gray-300 focus:outline-none"
-                  placeholder="Level (e.g. B2)"
-                  value={lang.level}
-                  onChange={(e) => {
-                    const updated = [...languages];
-                    updated[index].level = e.target.value;
-                    setLanguages(updated);
-                  }}
-                />
-                <button
-                  className="text-red-500 mt-1 text-sm font-bold"
-                  onClick={() => {
-                    const updated = languages.filter((_, i) => i !== index);
-                    setLanguages(updated);
-                  }}
+                  className="border rounded px-2 py-1 text-blue-600 font-semibold"
                 >
-                  Remove
-                </button>
+                  {careerTracks.map((track) => (
+                    <option key={track.id} value={track.id}>
+                      {track.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-            ))}
-
-            <button
-              className="mt-2 text-custom-utad-logo font-bold text-[18px]"
-              onClick={() =>
-                setLanguages([...languages, { name: "", level: "" }])
-              }
-            >
-              + Add language
-            </button>
-          </div>
-
-          <div className="border border-custom-utad-logo rounded-md p-4 w-3/4 flex flex-col gap-4">
-            <input
-              type="file"
-              ref={cvInputRef}
-              onChange={handleCVChange}
-              className="hidden"
-            />
-            <button
-              className="bg-[#E5E9EC] items-center flex flex-col text-custom-utad-logo text-[18px] font-600 rounded-md py-6"
-              onClick={uploadCV}
-            >
-              <Image src="/upload.png" width={35} height={46} alt="Upload CV" />
-              <p className="mt-5">UPLOAD CV</p>
-            </button>
-          </div>
-        </div>
+  
+              <button
+                onClick={async () => {
+                  const token = localStorage.getItem("token");
+                  const student = students.find(
+                    (s) => s.profileId === selectedStudent
+                  );
+                  const top = recommendations.find(
+                    (r) => r.careerTypeId === selectedTrack
+                  );
+  
+                  if (!token || !top || !student) {
+                    alert("Missing required data for PDF generation");
+                    return;
+                  }
+  
+                  try {
+                    const response = await fetch("/api/careers/report", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        topRecommendations: [top],
+                        profileId: student.profileId,
+                      }),
+                    });
+  
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+  
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `${student.userId}_career_report.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.URL.revokeObjectURL(url);
+                  } catch (err) {
+                    console.error("PDF generation failed:", err);
+                    alert("Failed to generate PDF.");
+                  }
+                }}
+                className="border px-4 py-2 rounded text-sm font-semibold"
+              >
+                Generate PDF
+              </button>
+            </div>
+  
+            <p className="text-sm text-gray-600 mb-2">{selectedDescription}</p>
+            <p className="text-sm text-gray-600 mb-4">
+              He/She is {selectedFitness} fit for this position.
+            </p>
+  
+            <ul className="space-y-3">
+              {skills.map((skill, i) => (
+                <li key={i} className="flex items-center gap-4">
+                  <span className="w-48 font-medium text-sm text-blue-700">
+                    {skill.name}
+                  </span>
+                  <div className="relative bg-gray-200 h-3 flex-1 rounded">
+                    <div
+                      className="absolute top-[0px] w-3 h-3 bg-blue-700 rounded-full z-10"
+                      style={{
+                        left: `${(skill.current / 5) * 100}%`,
+                        transform: "translateX(-50%)",
+                      }}
+                    ></div>
+                    <div
+                      className="absolute top-[0px] w-3 h-3 bg-gray-300 rounded-full z-0"
+                      style={{
+                        left: `${(skill.desired / 5) * 100}%`,
+                        transform: "translateX(-50%)",
+                      }}
+                    ></div>
+                  </div>
+                  <div className="w-20 text-sm font-semibold text-gray-700 text-right">
+                    {skill.current}
+                  </div>
+                  <div className="w-10 text-sm font-semibold text-gray-700 text-right">
+                    |
+                  </div>
+                  <div className="w-20 text-sm font-semibold text-gray-700 text-center">
+                    {skill.desired}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );
+  
 }

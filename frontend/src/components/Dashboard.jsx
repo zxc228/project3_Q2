@@ -41,10 +41,11 @@ const Dashboard = () => {
   
   const handleGeneratePDF = async () => {
     const token = localStorage.getItem("token");
+    const profileId = localStorage.getItem("profileId");
     const track = recommendations.find(r => r.careerTypeId === selectedTrack);
   
-    if (!token || !track) {
-      alert("Missing token or selected track");
+    if (!token || !track || !profileId) {
+      alert("Missing token, selected track, or profile ID");
       return;
     }
   
@@ -55,12 +56,11 @@ const Dashboard = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ topRecommendations: [track] })
+        body: JSON.stringify({
+          topRecommendations: [track],
+          profileId: profileId
+        })
       });
-  
-      // if (!response.ok) {
-      //   throw new Error("Failed to generate PDF");
-      // }
   
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -77,6 +77,7 @@ const Dashboard = () => {
       alert("Failed to generate PDF.");
     }
   };
+  
   
 
   const router = useRouter();
@@ -197,7 +198,7 @@ const Dashboard = () => {
               <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
                 GENERATE CAREER ADVICE
               </button>
-              <p className="text-sm text-red-500 mt-2">*Upload your CV in the Profile and try again*</p>
+              {/* <p className="text-sm text-red-500 mt-2">*Upload your CV in the Profile and try again*</p> */}
             </div>
           </div>
         </section>
@@ -340,7 +341,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* Personal Progress Section */}
+        {/* Personal Progress Section
         <section
           className={`bg-white p-6 shadow rounded transition-all ${
             isExpanded ? "fixed inset-0 z-50 overflow-y-auto" : "mb-6"
@@ -510,7 +511,19 @@ const Dashboard = () => {
               ))}
             </div>
           )}
+        </section> */}
+        {/* Placeholder for upcoming features */}
+        <section className="bg-gray-100 p-6 shadow rounded mb-6 border border-dashed border-gray-400">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-500 mb-2">
+              Further development in progress...
+            </h2>
+            <p className="text-gray-500">
+              This section will include Personal Progress tracking, course uploads, and status reviews. Stay tuned!
+            </p>
+          </div>
         </section>
+
       </main>
     </div>
   );  

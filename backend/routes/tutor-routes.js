@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const pool = require('../config/db');
 
 /**
  * tutor routes implementation
@@ -9,6 +10,31 @@ const router = express.Router();
  */
 module.exports = function(services) {
   const { tutorService } = services;
+   /**
+   * emergency: get all students
+   * GET /api/tutors/emergency-students
+   */
+   router.get('/all-students', async (req, res, next) => {
+    try {
+      const result = await pool.query(`
+        SELECT u.id AS userid, u.email, p.id AS profileid
+        FROM "User" u
+        JOIN "Profile" p ON p.userid = u.id
+        WHERE u.role = 'STUDENT'
+      `);
+  
+      const students = result.rows.map(row => ({
+        userId: row.userid,
+        profileId: row.profileid,
+        email: row.email,
+      }));
+  
+      res.json(students);
+    } catch (error) {
+      console.error('All students route error:', error);
+      next(error);
+    }
+  });
 
   /**
    * getting all tutors
@@ -151,6 +177,31 @@ module.exports = function(services) {
       next(error);
     }
   });
-
+    /**
+   * emergency: get all students
+   * GET /api/tutors/emergency-students
+   */
+    router.get('/all-students', async (req, res, next) => {
+      try {
+        
+       
+        const result = await services.pool.query(`
+          SELECT id, email, role
+          FROM "User"
+          WHERE role = 'STUDENT'
+        `);
+  
+        const students = result.rows.map(user => ({
+          id: user.id,
+          email: user.email,
+        }));
+  
+        res.json(students);
+      } catch (error) {
+        console.error('All students route error:', error);
+        next(error);
+      }
+    });
+  
   return router;
 };
