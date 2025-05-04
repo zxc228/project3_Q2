@@ -1,8 +1,9 @@
 "use client";
-import { useState, React, useEffect } from "react";
+import { useState, React, useEffect, useRef} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-hot-toast';
 
 const Dashboard = () => {
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
@@ -43,7 +44,7 @@ const Dashboard = () => {
     const track = recommendations.find((r) => r.careerTypeId === selectedTrack);
 
     if (!token || !track || !profileId) {
-      alert("Missing token, selected track, or profile ID");
+      toast.error("Missing token, selected track, or profile ID");
       return;
     }
 
@@ -72,7 +73,7 @@ const Dashboard = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("PDF generation failed:", err);
-      alert("Failed to generate PDF.");
+      toast.error("Failed to generate PDF.");
     }
   };
 
@@ -142,18 +143,37 @@ const Dashboard = () => {
     "Suggest vital recommended skills to develop",
   ];
 
-  const handleSenenFeature = async () => {
-    // const fileInput = // Get the cv
-    // const emailInput = // Get the email
+  const fileInputRef = useRef(null);
+  const [selectedFileName, setSelectedFileName] = useState("Choose CV file");
 
-    if (!fileInput || !emailInput || !fileInput.files[0]) {
-      alert("Please select a file and enter an email.");
+  const handleSenenFeature = async () => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!fileInputRef.current || !fileInputRef.current.files[0] || !userId || !token) {
+      toast.error("Missing file, userId or token");
+      return;
+    }
+
+    // Get email from backend first
+    const emailRes = await fetch("/api/profiles/user/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId }),
+    });
+
+    const emailData = await emailRes.json();
+    if (!emailRes.ok || !emailData.email) {
+      toast.error("Failed to fetch email");
       return;
     }
 
     const formData = new FormData();
-    formData.append("cv", fileInput.files[0]);
-    formData.append("email", emailInput.value);
+    formData.append("cv", fileInputRef.current.files[0]);
+    formData.append("email", emailData.email);
 
     try {
       const response = await fetch("http://138.68.126.118:3000/api/cv", {
@@ -163,12 +183,12 @@ const Dashboard = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        alert(`Upload failed: ${errorText}`);
+        toast.error(`Upload failed: ${errorText}`);
       } else {
-        alert("CV uploaded successfully!");
+        toast.success("CV uploaded successfully! Check your email for results in five minutes.");
       }
     } catch (error) {
-      alert(`An error occurred: ${error.message}`);
+      toast.error(`An error occurred: ${error.message}`);
     }
   };
 
@@ -245,13 +265,28 @@ const Dashboard = () => {
                 <br />
                 of your CV in the Profile page
               </p>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files[0]) {
+                    setSelectedFileName(e.target.files[0].name);
+                  }
+                }}
+              />
               <button
-                className="bg-custom-utad-logo text-[14px] font-bold text-white px-4 py-2 rounded w-full"
-                onClick={handleSenenFeature}
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-2 text-sm text-blue-600 underline"
               >
-                GENERATE CAREER ADVICE
+                {selectedFileName}
               </button>
-              {/* <p className="text-[14px] font-bold text-[#FF4929] mt-2">*Upload your CV in the Profile and try again*</p> */}
+              <button
+                onClick={handleSenenFeature}
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-blue-700 transition"
+              >
+                Upload CV
+              </button>
             </div>
           </div>
         </section>
