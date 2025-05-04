@@ -69,7 +69,7 @@ class AuthService {
 
       if (existing.rowCount === 0) {
         // только если у студента есть degreeId
-        if (user.role === 'student' && user.studies) {
+        if (user.role === 'STUDENT' && user.studies) {
           await pool.query(`
             INSERT INTO "Profile" 
             (id, userid, firstname, lastname, degreeid, graduationyear, bio)
@@ -85,7 +85,7 @@ class AuthService {
           ]);
       
           console.log(`🟢 Profile created for student ${user.id}`);
-        } else if (user.role === 'teacher') {
+        } else if (user.role === 'TECAHER') {
           await pool.query(`
             INSERT INTO "Profile" 
             (id, userid, firstname, lastname, graduationyear, bio)
