@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Student Report</title>
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url(data:font/ttf;base64,{{base64Font}});
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            font-style: normal;
+            margin: 2rem; 
+            margin-top: 0;
+        }
+
+        section { 
+            margin-bottom: 2rem; 
+            padding: 0 1rem 0 1rem; 
+            background: #fff; 
+            border: 2px solid #0065EF;
+            border-radius: 14px; 
+        }
+
+        ul { padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        h1, h2, h3 { color: black; }
+
+        li {
+          list-style: none;
+          position: relative;
+          padding-left: 1.2em;
+        }
+
+        li:not(.skill)::before {
+          content: "●";
+          color: #0065EF;
+          position: absolute;
+          left: 0;
+        }
+
+        li.skill::before {
+          content: "▸";
+          color: #0065EF;
+          position: absolute;
+          left: 0;
+        }
+
+        /*
+        .lang, .track-skill { 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        */
+    </style>
+</head>
+<body>
+    <h1 style='text-align:center; margin-top:0;padding-top:0;'>Student Report</h1>
+
+    <section id='basic_info'>
+        <h2>Basic Info</h2>
+        <p><strong>Degree:</strong> {{degree}}</p>
+        <p><strong>Year:</strong> {{year}}</p>
+        {{#if portfolio}}
+        <p><strong>Portfolio:</strong> {{portfolio}}</p>
+        {{/if}}
+        <p><strong>Description:</strong> {{description}}</p>
+    </section>
+
+    <section id='languages'>
+        <h2>Languages</h2>
+        <ul>
+            {{#each languages}}
+            <li class="lang">
+                <span>{{name}}</span>, <span>{{level}}</span>
+            </li>
+            {{/each}}
+        </ul>
+    </section>
+
+    <section id='skills'>
+        <h2>Skills</h2>
+        <ul>
+          {{#each skills}}<li>{{this}}</li>{{/each}}
+        </ul>
+    </section>
+
+    <section id='experience'>
+        <h2>Experience</h2>
+        {{#each experience}}
+        <ul>
+            <li style='padding-bottom:0.5rem;'>
+                <h3>{{title}} at {{institution}}</h3>
+                <p><strong>Duration:</strong> {{duration}}</p>
+                <p>{{desc}}</p>
+            </li>
+        </ul>
+        {{/each}}
+    </section>
+
+    <section id='courses'>
+        <h2>Courses</h2>
+        {{#each courses}}
+        <ul>
+            <li style='padding-bottom:0.5rem;'>
+                <h3>{{title}} - {{institution}}</h3>
+                <p><strong>Duration:</strong> {{duration}}</p>
+                <p>{{desc}}</p>
+            </li>
+        </ul>
+        {{/each}}
+    </section>
+
+    {{#if careerTracks}} 
+    <h1 style='text-align:center;'>Career Tracks</h1>
+    {{#each careerTracks}}
+    <section>
+        <h3>{{title}}</h3>
+        <p>{{desc}}</p>
+        <ul>
+            {{#each skills}}
+            <li class="track-skill skill">
+                <strong>{{name}}</strong>
+                <span> → {{currentLevel}}/{{desiredLevel}}</span>
+            </li>
+            {{/each}}
+        </ul>
+    </li>
+    </section>
+    {{/each}}
+    {{/if}}
+
+    <!--
+    <section id='career_tracks'>
+        <h2>Career Tracks</h2>
+        {{#each careerTracks}}
+        <ul>
+        <li style='padding-bottom: 0.5rem;'>
+            <h3>{{title}}</h3>
+            <p>{{desc}}</p>
+            <ul>
+                {{#each skills}}
+                <li class="track-skill skill">
+                    <strong>{{name}}</strong>
+                    <span> → {{currentLevel}}/{{desiredLevel}}</span>
+                </li>
+                {{/each}}
+            </ul>
+        </li>
+        </ul>
+        {{/each}}
+    </section>
+    -->
+</body>
+</html>

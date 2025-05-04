@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Student Report</title>
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url(data:font/ttf;base64,{{base64Font}});
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            font-style: normal;
+            margin: 2rem; 
+            margin-top: 0;
+        }
+
+        section { 
+            margin-bottom: 2rem; 
+            padding: 0 1rem 0 1rem; 
+            background: #fff; 
+            border: 2px solid #0065EF;
+            border-radius: 14px; 
+        }
+
+        ul { padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        h1, h2, h3 { color: black; }
+
+        li {
+          list-style: none;
+          position: relative;
+          padding-left: 1.2em;
+        }
+
+        li:not(.skill)::before {
+          content: "●";
+          color: #0065EF;
+          position: absolute;
+          left: 0;
+        }
+
+        li.skill::before {
+          content: "▸";
+          color: #0065EF;
+          position: absolute;
+          left: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 style='text-align:center;'>Career Tracks</h1>
+    {{#each careerTracks}}
+    <section>
+        <h3>{{title}}</h3>
+        <p>{{desc}}</p>
+        <ul>
+            {{#each skills}}
+            <li class="track-skill skill">
+                <strong>{{name}}</strong>
+                <span> → {{currentLevel}}/{{desiredLevel}}</span>
+            </li>
+            {{/each}}
+        </ul>
+    </li>
+    </section>
+    {{/each}}
+</body>
