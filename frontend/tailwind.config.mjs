@@ -15,14 +15,16 @@ const config = {
       },
       fontFamily: {
         montserrat: ["Montserrat", "sans-serif"],
-      },
-      fontWeight: {
-        400: "400",
-        500: "500",
-        600: "600",
-        700: "700",
-        800: "800",
-        900: "900",
+        /**
+         * font-thin (100)
+         * font-light (300)
+         * font-normal (400)
+         * font-medium (500)
+         * font-semibold (600)
+         * font-bold (700)
+         * font-extrabold (800)
+         * font-black (900)
+         */
       },
     },
   },
