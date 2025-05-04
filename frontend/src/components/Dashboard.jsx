@@ -1,35 +1,34 @@
 "use client";
 import { useState, React, useEffect } from "react";
-
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
-  
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState("progress");
-
 
   const [selectedDescription, setSelectedDescription] = useState("");
   const [selectedFitness, setSelectedFitness] = useState("");
-  
 
   const loadDescription = async (careerTypeId) => {
     const token = localStorage.getItem("token");
-  
+
     if (!token) {
       console.error("No auth token found");
       setSelectedDescription("No description available.");
       return;
     }
-  
+
     try {
-      const res = await fetch(`/api/careers/types/${careerTypeId}/description`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
+      const res = await fetch(
+        `/api/careers/types/${careerTypeId}/description`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       const data = await res.json();
       setSelectedDescription(data.description || "No description available.");
     } catch (err) {
@@ -37,34 +36,33 @@ const Dashboard = () => {
       setSelectedDescription("No description available.");
     }
   };
-  
-  
+
   const handleGeneratePDF = async () => {
     const token = localStorage.getItem("token");
     const profileId = localStorage.getItem("profileId");
-    const track = recommendations.find(r => r.careerTypeId === selectedTrack);
-  
+    const track = recommendations.find((r) => r.careerTypeId === selectedTrack);
+
     if (!token || !track || !profileId) {
       alert("Missing token, selected track, or profile ID");
       return;
     }
-  
+
     try {
       const response = await fetch("/api/careers/report", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           topRecommendations: [track],
-          profileId: profileId
-        })
+          profileId: profileId,
+        }),
       });
-  
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-  
+
       const link = document.createElement("a");
       link.href = url;
       link.download = `${track.careerFieldName}_${track.careerType}.pdf`;
@@ -77,8 +75,6 @@ const Dashboard = () => {
       alert("Failed to generate PDF.");
     }
   };
-  
-  
 
   const router = useRouter();
   useEffect(() => {
@@ -87,13 +83,13 @@ const Dashboard = () => {
       router.push("/");
     }
   }, []);
+
   const handleClick = () => {
     router.push("/assessment");
   };
 
   const [careerTracks, setCareerTracks] = useState([]);
   const [skills, setSkills] = useState([]);
-
   const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
@@ -104,33 +100,32 @@ const Dashboard = () => {
       router.push("/");
       return;
     }
-    console.log("profileId", profileId);  
+    console.log("profileId", profileId);
     fetch(`/api/careers/profiles/${profileId}/recommendations`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         const top = data.topRecommendations;
 
         setRecommendations(top);
 
-        const trackNames = top.map(r => ({
+        const trackNames = top.map((r) => ({
           label: `${r.careerFieldName} (${r.careerType})`,
           id: r.careerTypeId,
         }));
         setCareerTracks(trackNames);
         setSelectedTrack(trackNames[0].id);
 
-
         loadDescription(trackNames[0].id);
 
         const firstFitness = Math.round((top[0].fitnessScore / 5) * 100);
         setSelectedFitness(`${firstFitness}%`);
-        const initial = top.find(r => r.careerFieldName === trackNames[0]);
+        const initial = top.find((r) => r.careerFieldName === trackNames[0]);
         if (initial) {
-          const s = initial.skillAssessments.map(skill => ({
+          const s = initial.skillAssessments.map((skill) => ({
             name: skill.skillName,
             current: skill.currentLevel,
             desired: skill.currentLevel + (skill.gap || 0),
@@ -141,64 +136,122 @@ const Dashboard = () => {
       .catch(console.error);
   }, []);
 
+  const aiCoachLines = [
+    "Generate a CV summary",
+    "Suggest best Career Paths",
+    "Suggest vital recommended skills to develop",
+  ];
 
-  const [courses, setCourses] = useState([
-    { id: 1, expanded: true },
-    { id: 2, expanded: true },
-  ]);
+  const handleSenenFeature = async () => {
+    // const fileInput = // Get the cv
+    // const emailInput = // Get the email
 
-  const aiCoachMessage = "With the help of AI Career Coach you will receive:\n- Generate a CV summary\n- Suggest best Career Paths\n- Suggest vital recommended skills to develop";
+    if (!fileInput || !emailInput || !fileInput.files[0]) {
+      alert("Please select a file and enter an email.");
+      return;
+    }
 
-  const getPlatformImage = (url) => {
-    if (!url) return "/default.png";
-    const lower = url.toLowerCase();
-    return "/default.png";
+    const formData = new FormData();
+    formData.append("cv", fileInput.files[0]);
+    formData.append("email", emailInput.value);
+
+    try {
+      const response = await fetch("http://138.68.126.118:3000/api/cv", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert(`Upload failed: ${errorText}`);
+      } else {
+        alert("CV uploaded successfully!");
+      }
+    } catch (error) {
+      alert(`An error occurred: ${error.message}`);
+    }
   };
-  
 
   return (
-    <div className="flex min-h-screen bg-gray-100 text-blue-600">
-      {/* Sidebar */}
-      <aside className="w-64 bg-blue-600 text-white p-5 flex flex-col min-h-screen">
-        <div className="text-lg font-bold mb-5">U-Tad</div>
-        <nav className="flex-grow">
-          <ul>
-          <li 
-              className="mb-2 cursor-pointer hover:underline"
-              onClick={() => router.push("/student-profile")}
+    <div className="flex h-screen font-montserrat">
+      <aside className="bg-custom-utad-logo w-[345px] fixed h-full flex flex-col justify-between py-10 px-6">
+        <div>
+          <Image src="/u-tad-nobg.png" width={160} height={50} alt="Logo" />
+          <nav className="mt-20 space-y-6 flex flex-col">
+            <Link
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
+              href={"/student-profile"}
             >
-              Profile
-            </li>
-            <li className="mb-2 cursor-pointer font-bold">Dashboard</li>  
-          </ul>
-        </nav>
+              <Image
+                src={"/svg/Profile.svg"}
+                width={25}
+                height={25}
+                alt="Profile Link"
+              />
+              <span>Profile</span>
+            </Link>
+            <Link
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
+              href={"/dashboard"}
+            >
+              <Image
+                src={"/svg/Dashboard.svg"}
+                width={25}
+                height={25}
+                alt="Dashboard Link"
+              />
+              <span>Dashboard</span>
+            </Link>
+          </nav>
+        </div>
         <button
           onClick={() => {
-            localStorage.clear(); 
-            router.push("/"); 
+            localStorage.clear();
+            router.push("/");
           }}
-          className="mt-auto border border-white px-4 py-2"
+          className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
         >
+          <Image
+            src={"/svg/SignOut.svg"}
+            width={25}
+            height={25}
+            alt="Sign Out"
+          />
           Sign out
         </button>
-      </aside> 
+      </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-6 relative">
-
+      <main className="ml-[345px] w-full px-10 py-10">
         {/* AI Career Coach Section */}
-        <section className="bg-gray-200 p-6 shadow rounded mb-6">
-          <div className="flex justify-between items-start">
+        <section className="bg-[#E5E9EC] p-5 rounded">
+          <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-sm text-gray-900 font-semibold text-lg mb-2">AI Career Coach</h1>
-              <p className="text-sm text-gray-600 whitespace-pre-line">{aiCoachMessage}</p>
+              <h1 className="text-[28px] text-[#14192C] font-extrabold">
+                AI Career Coach
+              </h1>
+              <p className="text-[16px] text-[#14192C] font-normal mt-7">
+                With the help of AI Career Coach you will receive:
+              </p>
+              <ul className="list-disc pl-6 text-[16px] text-[#14192C] font-normal">
+                {aiCoachLines.map((line, index) => (
+                  <li key={index}>{line}</li>
+                ))}
+              </ul>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600 mb-2">Make sure to have the latest version<br />of your CV in the Profile page</p>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
+            <div className="text-center mr-40">
+              <p className="text-[14px] text-[#14192C] font-normal mb-5">
+                Make sure to have the latest version
+                <br />
+                of your CV in the Profile page
+              </p>
+              <button
+                className="bg-custom-utad-logo text-[14px] font-bold text-white px-4 py-2 rounded w-full"
+                onClick={handleSenenFeature}
+              >
                 GENERATE CAREER ADVICE
               </button>
-              {/* <p className="text-sm text-red-500 mt-2">*Upload your CV in the Profile and try again*</p> */}
+              {/* <p className="text-[14px] font-bold text-[#FF4929] mt-2">*Upload your CV in the Profile and try again*</p> */}
             </div>
           </div>
         </section>
@@ -215,57 +268,71 @@ const Dashboard = () => {
                   setSelectedTrack(selectedId);
                   loadDescription(selectedId);
 
-                  const found = recommendations.find(r => r.careerTypeId === selectedId);
+                  const found = recommendations.find(
+                    (r) => r.careerTypeId === selectedId
+                  );
                   if (found) {
-                    const newSkills = found.skillAssessments.map(skill => ({
+                    const newSkills = found.skillAssessments.map((skill) => ({
                       name: skill.skillName,
                       current: skill.currentLevel,
                       desired: skill.currentLevel + (skill.gap || 0),
                     }));
                     setSkills(newSkills);
-                    setSelectedFitness(`${Math.round((found.fitnessScore / 5) * 100)}%`);
+                    setSelectedFitness(
+                      `${Math.round((found.fitnessScore / 5) * 100)}%`
+                    );
                   }
                 }}
                 className="border rounded px-2 py-1 text-blue-600 font-semibold"
               >
                 {careerTracks.map((track) => (
-                  <option key={track.id} value={track.id}>{track.label}</option>
+                  <option key={track.id} value={track.id}>
+                    {track.label}
+                  </option>
                 ))}
               </select>
-
             </div>
-            <button onClick={handleGeneratePDF} className="border px-4 py-2 rounded text-sm font-semibold">
+            <button
+              onClick={handleGeneratePDF}
+              className="border px-4 py-2 rounded text-sm font-semibold"
+            >
               Generate PDF
             </button>
-
           </div>
 
-          <p className="text-sm text-gray-600 mb-2">
-            {selectedDescription}
-          </p>
+          <p className="text-sm text-gray-600 mb-2">{selectedDescription}</p>
           <p className="text-sm text-gray-600 mb-4">
             You are {selectedFitness} fit for this position.
           </p>
 
-
           <div className="flex justify-between items-center mb-1">
             <h3 className="font-semibold mb-1">Skills</h3>
-            <div className="w-48 text-sm font-semibold text-gray-700 text-left">Current level | Desired</div>
+            <div className="w-48 text-sm font-semibold text-gray-700 text-left">
+              Current level | Desired
+            </div>
           </div>
 
           <ul className="space-y-3">
             {skills.map((skill, i) => (
               <li key={i} className="flex items-center gap-4">
-                <span className="w-48 font-medium text-sm text-blue-700">{skill.name}</span>
+                <span className="w-48 font-medium text-sm text-blue-700">
+                  {skill.name}
+                </span>
 
                 <div className="relative bg-gray-200 h-3 flex-1 rounded">
                   <div
                     className="absolute top-[0px] w-3 h-3 bg-blue-700 rounded-full z-10"
-                    style={{ left: `${(skill.current / 5) * 100}%`, transform: 'translateX(-50%)' }}
+                    style={{
+                      left: `${(skill.current / 5) * 100}%`,
+                      transform: "translateX(-50%)",
+                    }}
                   ></div>
                   <div
                     className="absolute top-[0px] w-3 h-3 bg-gray-300 rounded-full z-0"
-                    style={{ left: `${(skill.desired / 5) * 100}%`, transform: 'translateX(-50%)' }}
+                    style={{
+                      left: `${(skill.desired / 5) * 100}%`,
+                      transform: "translateX(-50%)",
+                    }}
                   ></div>
                 </div>
 
@@ -285,22 +352,25 @@ const Dashboard = () => {
           {/* <p className="text-xs text-gray-500 mt-3">Improve a skill to level 3 to obtain a badge!</p> */}
         </section>
 
-
         {/* Self Assessment placeholder */}
         <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-lg">Academic Record Assessment</h2>
-            <button className="border px-4 py-2 rounded">Complete Academic Record Assessment</button>
-            </div>
+            <h2 className="font-semibold text-lg">
+              Academic Record Assessment
+            </h2>
+            <button className="border px-4 py-2 rounded">
+              Complete Academic Record Assessment
+            </button>
+          </div>
         </section>
-
-
 
         <section className="bg-white p-6 shadow rounded mb-6">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold text-lg">Self-Assessment</h2>
-            <button onClick={handleClick} className="border px-4 py-2 rounded">Complete Self-Assessment</button>
-{/* 
+            <button onClick={handleClick} className="border px-4 py-2 rounded">
+              Complete Self-Assessment
+            </button>
+            {/* 
           </div>
           <div className="mt-4">
             <div className="bg-gray-200 p-4 rounded mb-2 flex justify-between items-center">
@@ -519,14 +589,14 @@ const Dashboard = () => {
               Further development in progress...
             </h2>
             <p className="text-gray-500">
-              This section will include Personal Progress tracking, course uploads, and status reviews. Stay tuned!
+              This section will include Personal Progress tracking, course
+              uploads, and status reviews. Stay tuned!
             </p>
           </div>
         </section>
-
       </main>
     </div>
-  );  
+  );
 };
 
 export default Dashboard;
