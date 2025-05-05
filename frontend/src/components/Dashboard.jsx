@@ -264,50 +264,56 @@ const Dashboard = () => {
       </aside>
 
       <main className="ml-[345px] w-full px-10 py-10">
-        <section className="bg-[#E5E9EC] p-5 rounded-lg">
+
+        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-[28px] text-[#14192C] font-extrabold">
-                AI Career Coach
-              </h1>
-              <p className="text-[16px] text-[#14192C] font-normal mt-7">
-                With the help of AI Career Coach you will receive:
-              </p>
-              <ul className="list-disc pl-6 text-[16px] text-[#14192C] font-normal">
-                {aiCoachLines.map((line, index) => (
-                  <li key={index}>{line}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="text-center mr-40 w-1/5">
-              <p className="text-[14px] text-[#14192C] font-normal">
-                Input your CV here
-              </p>
-              <div className="flex flex-col">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files[0]) {
-                      setSelectedFileName(e.target.files[0].name);
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-2 text-[14px] font-normal text-blue-600 underline"
-                >
-                  {selectedFileName}
+            <h2 className="text-[28px] font-extrabold text-[#14192C]">
+              Self-Assessment
+            </h2>
+            <button
+              onClick={handleClick}
+              className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[14px] rounded-md text-center flex justify-center items-center"
+            >
+              COMPLETE SELF-ASSESMENT
+            </button>
+            {/* 
+          </div>
+          <div className="mt-4">
+            <div className="bg-gray-200 p-4 rounded mb-2 flex justify-between items-center">
+              <div>
+                <p className="font-semibold">Self-Assessment Results</p>
+                <p className="text-sm text-gray-600">
+                  Date completed: 31/03/2025
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button>
+                  <span className="material-icons">👁️</span>
                 </button>
-                <button
-                  onClick={handleSenenFeature}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-[14px] font-bold hover:bg-blue-700 transition"
-                >
-                  GENERATE CAREER ADVICE
+                <button>
+                  <span className="material-icons">⬇️</span>
                 </button>
               </div>
             </div>
+            <div className="bg-gray-200 p-4 rounded mb-4 flex justify-between items-center">
+              <div>
+                <p className="font-semibold">Self-Assessment Results</p>
+                <p className="text-sm text-gray-600">
+                  Date completed: 28/03/2025
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button>
+                  <span className="material-icons">👁️</span>
+                </button>
+                <button>
+                  <span className="material-icons">⬇️</span>
+                </button>
+              </div>
+            </div> */}
+            {/* <button className="mx-auto block border px-4 py-2 rounded bg-white">
+              See More
+            </button> */}
           </div>
         </section>
 
@@ -383,6 +389,9 @@ const Dashboard = () => {
               <br />
               <strong>Desired level:</strong> The level you should aim for to be
               competitive in this field.
+              <br />
+              <strong>Fitness level:</strong> Shows how fit you are for this position. 
+              Calculated based on the skills that are not yet on or above the desired level.
             </p>
           </Explanation>
 
@@ -433,58 +442,54 @@ const Dashboard = () => {
           {/* <p className="text-xs text-gray-500 mt-3">Improve a skill to level 3 to obtain a badge!</p> */}
         </section>
 
-        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-[28px] font-extrabold text-[#14192C]">
-              Self-Assessment
-            </h2>
-            <button
-              onClick={handleClick}
-              className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[14px] rounded-md text-center flex justify-center items-center"
-            >
-              COMPLETE SELF-ASSESMENT
-            </button>
-            {/* 
-          </div>
-          <div className="mt-4">
-            <div className="bg-gray-200 p-4 rounded mb-2 flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Self-Assessment Results</p>
-                <p className="text-sm text-gray-600">
-                  Date completed: 31/03/2025
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button>
-                  <span className="material-icons">👁️</span>
+        <section className="bg-[#E5E9EC] p-5 rounded-lg mt-10">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h1 className="text-[28px] text-[#14192C] font-extrabold">
+                AI Career Coach
+              </h1>
+              <p className="text-[16px] text-[#14192C] font-normal mt-7">
+                With the help of our extra feature, AI Career Coach, you will receive:
+              </p>
+              <ul className="list-disc pl-6 text-[16px] text-[#14192C] font-normal">
+                {aiCoachLines.map((line, index) => (
+                  <li key={index}>{line}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="text-center mr-40 w-1/5">
+              <p className="text-[14px] text-[#14192C] font-normal">
+                Input your CV here
+              </p>
+              <div className="flex flex-col">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      setSelectedFileName(e.target.files[0].name);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 text-[14px] font-normal text-blue-600 underline"
+                >
+                  {selectedFileName}
                 </button>
-                <button>
-                  <span className="material-icons">⬇️</span>
+                <button
+                  onClick={handleSenenFeature}
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-[14px] font-bold hover:bg-blue-700 transition"
+                >
+                  GENERATE CAREER ADVICE
                 </button>
               </div>
             </div>
-            <div className="bg-gray-200 p-4 rounded mb-4 flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Self-Assessment Results</p>
-                <p className="text-sm text-gray-600">
-                  Date completed: 28/03/2025
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button>
-                  <span className="material-icons">👁️</span>
-                </button>
-                <button>
-                  <span className="material-icons">⬇️</span>
-                </button>
-              </div>
-            </div> */}
-            {/* <button className="mx-auto block border px-4 py-2 rounded bg-white">
-              See More
-            </button> */}
           </div>
         </section>
-        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
+
+        {/*<section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-[28px] font-extrabold text-[#14192C]">
               Academic Record Assessment
@@ -493,7 +498,7 @@ const Dashboard = () => {
               COMPLETE ACADEMIC RECORD ASSESSMENT
             </button>
           </div>
-        </section>
+        </section>*/}
 
         {/* Personal Progress Section
         <section
@@ -667,7 +672,7 @@ const Dashboard = () => {
           )}
         </section> */}
         {/* Placeholder for upcoming features */}
-        <section className="bg-gray-100 p-6 shadow rounded border border-dashed border-gray-400 mb-10">
+        <section className="bg-gray-100 p-6 shadow rounded border border-dashed border-gray-400 mt-10">
           <div className="text-center">
             <h2 className="text-xl font-bold text-gray-500 mb-2">
               Further development in progress...
