@@ -1,13 +1,14 @@
 "use client";
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+// TODO
 export default function AccountRecovery() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmPassword: ''
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({
@@ -19,9 +20,9 @@ export default function AccountRecovery() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -65,7 +66,7 @@ export default function AccountRecovery() {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-blue-600 flex justify-center items-center">
+      <div className="w-1/2 bg-custom-utad-logo flex justify-center items-center">
         <Image
           src="/u-tad-logo.png"
           alt="U-Tad Logo"
@@ -93,12 +94,13 @@ export default function AccountRecovery() {
                 value={formData.newPassword}
                 onChange={handleInputChange}
                 className={`w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none ${
-                  errors.newPassword ? 'border-red-500' : 'border-[#0065EF]'
+                  errors.newPassword ? "border-red-500" : "border-[#0065EF]"
                 } text-[#6F7276] font-bold`}
               />
               {errors.newPassword && (
                 <p className="text-red-500 text-sm mt-1">
-                  *Password must be at least 7 characters long and contain only letters and numbers*
+                  *Password must be at least 7 characters long and contain only
+                  letters and numbers*
                 </p>
               )}
             </div>
@@ -111,7 +113,7 @@ export default function AccountRecovery() {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 className={`w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-[#0065EF]'
+                  errors.confirmPassword ? "border-red-500" : "border-[#0065EF]"
                 } text-[#6F7276] font-bold`}
               />
               {errors.confirmPassword && (

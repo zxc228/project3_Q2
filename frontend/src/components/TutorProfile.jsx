@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function TutorProfile() {
@@ -21,9 +23,12 @@ export default function TutorProfile() {
     if (!token) return;
 
     try {
-      const res = await fetch(`/api/careers/types/${careerTypeId}/description`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `/api/careers/types/${careerTypeId}/description`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
       setSelectedDescription(data.description || "No description available.");
     } catch (err) {
@@ -56,13 +61,16 @@ export default function TutorProfile() {
 
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch(`/api/careers/profiles/${selectedStudent}/recommendations`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `/api/careers/profiles/${selectedStudent}/recommendations`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await res.json();
         setRecommendations(data.topRecommendations || []);
 
-        const trackNames = data.topRecommendations.map(r => ({
+        const trackNames = data.topRecommendations.map((r) => ({
           label: `${r.careerFieldName} (${r.careerType})`,
           id: r.careerTypeId,
         }));
@@ -76,7 +84,7 @@ export default function TutorProfile() {
           const firstFitness = Math.round((initial.fitnessScore / 5) * 100);
           setSelectedFitness(`${firstFitness}%`);
 
-          const s = initial.skillAssessments.map(skill => ({
+          const s = initial.skillAssessments.map((skill) => ({
             name: skill.skillName,
             current: skill.currentLevel,
             desired: skill.currentLevel + (skill.gap || 0),
@@ -95,26 +103,48 @@ export default function TutorProfile() {
     <div className="flex h-screen font-montserrat">
       <aside className="bg-custom-utad-logo w-[345px] fixed h-full flex flex-col justify-between py-10 px-6">
         <div>
-          <h1 className="text-white font-bold text-[24px]">Tutor Profile</h1>
+          <Image src="/u-tad-nobg.png" width={160} height={50} alt="Logo" />
+          <nav className="mt-20 space-y-6 flex flex-col">
+            <Link
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
+              href={"/student-profile"}
+            >
+              <Image
+                src={"/svg/Profile.svg"}
+                width={25}
+                height={25}
+                alt="Profile Link"
+              />
+              <span>Profile</span>
+            </Link>
+          </nav>
         </div>
         <button
           onClick={() => {
             localStorage.clear();
             router.push("/");
           }}
-          className="text-white font-bold text-[18px] text-left"
+          className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
         >
+          <Image
+            src={"/svg/SignOut.svg"}
+            width={25}
+            height={25}
+            alt="Sign Out"
+          />
           Sign out
         </button>
       </aside>
-  
+
       <div className="ml-[345px] w-full px-10 py-10">
         <section className="mb-8">
           <div className="flex items-center gap-6">
             <div className="flex flex-col">
               <h1 className="text-[32px] font-bold">Career Recommendations</h1>
               <div className="mt-4">
-                <label className="block font-semibold mb-2">Select Student:</label>
+                <label className="block text-[16px] font-semibold mb-2">
+                  Select Student:
+                </label>
                 <select
                   value={selectedStudent}
                   onChange={(e) => setSelectedStudent(e.target.value)}
@@ -130,19 +160,19 @@ export default function TutorProfile() {
             </div>
           </div>
         </section>
-  
+
         {recommendations.length > 0 && (
-          <section className="bg-white p-6 shadow rounded mb-6">
+          <section className="bg-white p-6 border-2 border-custom-utad-logo rounded-lg mb-6">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-lg">Career Track:</h2>
+                <h2 className="text-[28px] font-extrabold">Career Track:</h2>
                 <select
                   value={selectedTrack}
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setSelectedTrack(selectedId);
                     loadDescription(selectedId);
-  
+
                     const found = recommendations.find(
                       (r) => r.careerTypeId === selectedId
                     );
@@ -159,7 +189,7 @@ export default function TutorProfile() {
                       );
                     }
                   }}
-                  className="border rounded px-2 py-1 text-blue-600 font-semibold"
+                  className="text-blue-600 font-black text-[28px]"
                 >
                   {careerTracks.map((track) => (
                     <option key={track.id} value={track.id}>
@@ -168,7 +198,7 @@ export default function TutorProfile() {
                   ))}
                 </select>
               </div>
-  
+
               <button
                 onClick={async () => {
                   const token = localStorage.getItem("token");
@@ -178,12 +208,12 @@ export default function TutorProfile() {
                   const top = recommendations.find(
                     (r) => r.careerTypeId === selectedTrack
                   );
-  
+
                   if (!token || !top || !student) {
                     alert("Missing required data for PDF generation");
                     return;
                   }
-  
+
                   try {
                     const response = await fetch("/api/careers/report", {
                       method: "POST",
@@ -196,10 +226,10 @@ export default function TutorProfile() {
                         profileId: student.profileId,
                       }),
                     });
-  
+
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
-  
+
                     const link = document.createElement("a");
                     link.href = url;
                     link.download = `${student.userId}_career_report.pdf`;
@@ -212,21 +242,23 @@ export default function TutorProfile() {
                     alert("Failed to generate PDF.");
                   }
                 }}
-                className="border px-4 py-2 rounded text-sm font-semibold"
+                className="border px-4 py-2 rounded text-[16px] font-semibold"
               >
                 Generate PDF
               </button>
             </div>
-  
-            <p className="text-sm text-gray-600 mb-2">{selectedDescription}</p>
-            <p className="text-sm text-gray-600 mb-4">
+
+            <p className="text-[16px] font-normal text-[#383B42] mb-2">
+              {selectedDescription}
+            </p>
+            <p className="text-[16px] font-normal text-[#383B42] mb-4">
               He/She is {selectedFitness} fit for this position.
             </p>
-  
+
             <ul className="space-y-3">
               {skills.map((skill, i) => (
                 <li key={i} className="flex items-center gap-4">
-                  <span className="w-48 font-medium text-sm text-blue-700">
+                  <span className="w-48 font-normal text-[21px] text-[#14192C]">
                     {skill.name}
                   </span>
                   <div className="relative bg-gray-200 h-3 flex-1 rounded">
@@ -245,13 +277,13 @@ export default function TutorProfile() {
                       }}
                     ></div>
                   </div>
-                  <div className="w-20 text-sm font-semibold text-gray-700 text-right">
+                  <div className="w-20 text-[21px] font-normal text-[#14192C] text-right">
                     {skill.current}
                   </div>
-                  <div className="w-10 text-sm font-semibold text-gray-700 text-right">
+                  <div className="w-10 text-[21px] font-normal text-[#14192C] text-right">
                     |
                   </div>
-                  <div className="w-20 text-sm font-semibold text-gray-700 text-center">
+                  <div className="w-20 text-[21px] font-normal text-[#14192C] text-right">
                     {skill.desired}
                   </div>
                 </li>
@@ -262,5 +294,4 @@ export default function TutorProfile() {
       </div>
     </div>
   );
-  
 }

@@ -1,15 +1,19 @@
 "use client";
-import { useState, React, useEffect, useRef} from "react";
+import { useState, React, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
+import Explanation from "./Explanation";
 
 const Dashboard = () => {
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
 
   const [selectedDescription, setSelectedDescription] = useState("");
   const [selectedFitness, setSelectedFitness] = useState("");
+
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeout = useRef(null);
 
   const loadDescription = async (careerTypeId) => {
     const token = localStorage.getItem("token");
@@ -150,7 +154,12 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
-    if (!fileInputRef.current || !fileInputRef.current.files[0] || !userId || !token) {
+    if (
+      !fileInputRef.current ||
+      !fileInputRef.current.files[0] ||
+      !userId ||
+      !token
+    ) {
       toast.error("Missing file, userId or token");
       return;
     }
@@ -185,11 +194,24 @@ const Dashboard = () => {
         const errorText = await response.text();
         toast.error(`Upload failed: ${errorText}`);
       } else {
-        toast.success("CV uploaded successfully! Check your email for results in five minutes.");
+        toast.success(
+          "CV uploaded successfully! Check your email for results in a while."
+        );
       }
     } catch (error) {
       toast.error(`An error occurred: ${error.message}`);
     }
+  };
+
+  const handleHoverStart = () => {
+    clearTimeout(hoverTimeout.current);
+    setIsHovered(true);
+  };
+
+  const handleHoverEnd = () => {
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 3000);
   };
 
   return (
@@ -241,10 +263,8 @@ const Dashboard = () => {
         </button>
       </aside>
 
-      {/* Main content */}
       <main className="ml-[345px] w-full px-10 py-10">
-        {/* AI Career Coach Section */}
-        <section className="bg-[#E5E9EC] p-5 rounded">
+        <section className="bg-[#E5E9EC] p-5 rounded-lg">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-[28px] text-[#14192C] font-extrabold">
@@ -259,43 +279,42 @@ const Dashboard = () => {
                 ))}
               </ul>
             </div>
-            <div className="text-center mr-40">
-              <p className="text-[14px] text-[#14192C] font-normal mb-5">
-                Make sure to have the latest version
-                <br />
-                of your CV in the Profile page
+            <div className="text-center mr-40 w-1/5">
+              <p className="text-[14px] text-[#14192C] font-normal">
+                Input your CV here
               </p>
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files[0]) {
-                    setSelectedFileName(e.target.files[0].name);
-                  }
-                }}
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="mt-2 text-sm text-blue-600 underline"
-              >
-                {selectedFileName}
-              </button>
-              <button
-                onClick={handleSenenFeature}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-blue-700 transition"
-              >
-                Upload CV
-              </button>
+              <div className="flex flex-col">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      setSelectedFileName(e.target.files[0].name);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 text-[14px] font-normal text-blue-600 underline"
+                >
+                  {selectedFileName}
+                </button>
+                <button
+                  onClick={handleSenenFeature}
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-[14px] font-bold hover:bg-blue-700 transition"
+                >
+                  GENERATE CAREER ADVICE
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Career Track and Skills */}
-        <section className="bg-white p-6 shadow rounded mb-6">
+        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-lg">Career Track:</h2>
+              <h2 className="text-[28px] font-extrabold">Career Track:</h2>
               <select
                 value={selectedTrack}
                 onChange={(e) => {
@@ -318,7 +337,7 @@ const Dashboard = () => {
                     );
                   }
                 }}
-                className="border rounded px-2 py-1 text-blue-600 font-semibold"
+                className="text-blue-600 font-black text-[28px]"
               >
                 {careerTracks.map((track) => (
                   <option key={track.id} value={track.id}>
@@ -329,20 +348,47 @@ const Dashboard = () => {
             </div>
             <button
               onClick={handleGeneratePDF}
-              className="border px-4 py-2 rounded text-sm font-semibold"
+              className="border px-4 py-2 rounded text-[16px] font-semibold"
             >
               Generate PDF
             </button>
           </div>
 
-          <p className="text-sm text-gray-600 mb-2">{selectedDescription}</p>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-[16px] font-normal text-[#383B42] mb-2">
+            {selectedDescription}
+          </p>
+          <p className="text-[16px] font-normal text-[#383B42] mb-4">
             You are {selectedFitness} fit for this position.
           </p>
 
-          <div className="flex justify-between items-center mb-1">
-            <h3 className="font-semibold mb-1">Skills</h3>
-            <div className="w-48 text-sm font-semibold text-gray-700 text-left">
+          <button
+            onMouseEnter={handleHoverStart}
+            onMouseLeave={handleHoverEnd}
+            aria-label="Explanation"
+          >
+            <Image
+              src={"/svg/_/Big.svg"}
+              alt="Explanation"
+              width={20}
+              height={20}
+            />
+          </button>
+          <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
+            <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
+              What do these values represent?
+            </h1>
+            <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+              <strong>Current level:</strong> Your current skill level in this
+              area.
+              <br />
+              <strong>Desired level:</strong> The level you should aim for to be
+              competitive in this field.
+            </p>
+          </Explanation>
+
+          <div className="flex justify-between mb-1">
+            <p className="font-bold text-[24px] mb-2">Skills</p>
+            <div className="flex items-center text-[16px] font-bold text-[#14192C]">
               Current level | Desired
             </div>
           </div>
@@ -350,7 +396,7 @@ const Dashboard = () => {
           <ul className="space-y-3">
             {skills.map((skill, i) => (
               <li key={i} className="flex items-center gap-4">
-                <span className="w-48 font-medium text-sm text-blue-700">
+                <span className="w-48 font-normal text-[21px] text-[#14192C]">
                   {skill.name}
                 </span>
 
@@ -363,7 +409,7 @@ const Dashboard = () => {
                     }}
                   ></div>
                   <div
-                    className="absolute top-[0px] w-3 h-3 bg-gray-300 rounded-full z-0"
+                    className="absolute top-[0px] w-3 h-3 bg-gray-400 rounded-full z-0"
                     style={{
                       left: `${(skill.desired / 5) * 100}%`,
                       transform: "translateX(-50%)",
@@ -371,13 +417,13 @@ const Dashboard = () => {
                   ></div>
                 </div>
 
-                <div className="w-20 text-sm font-semibold text-gray-700 text-right">
+                <div className="w-20 text-[21px] font-normal text-[#14192C] text-right">
                   {skill.current}
                 </div>
-                <div className="w-10 text-sm font-semibold text-gray-700 text-right">
+                <div className="w-10 text-[21px] font-normal text-[#14192C] text-right">
                   |
                 </div>
-                <div className="w-20 text-sm font-semibold text-gray-700 text-center">
+                <div className="w-20 text-[21px] font-normal text-[#14192C] text-center">
                   {skill.desired}
                 </div>
               </li>
@@ -387,23 +433,16 @@ const Dashboard = () => {
           {/* <p className="text-xs text-gray-500 mt-3">Improve a skill to level 3 to obtain a badge!</p> */}
         </section>
 
-        {/* Self Assessment placeholder */}
-        <section className="bg-white p-6 shadow rounded mb-6">
+        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-lg">
-              Academic Record Assessment
+            <h2 className="text-[28px] font-extrabold text-[#14192C]">
+              Self-Assessment
             </h2>
-            <button className="border px-4 py-2 rounded">
-              Complete Academic Record Assessment
-            </button>
-          </div>
-        </section>
-
-        <section className="bg-white p-6 shadow rounded mb-6">
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-lg">Self-Assessment</h2>
-            <button onClick={handleClick} className="border px-4 py-2 rounded">
-              Complete Self-Assessment
+            <button
+              onClick={handleClick}
+              className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[14px] rounded-md text-center flex justify-center items-center"
+            >
+              COMPLETE SELF-ASSESMENT
             </button>
             {/* 
           </div>
@@ -443,6 +482,16 @@ const Dashboard = () => {
             {/* <button className="mx-auto block border px-4 py-2 rounded bg-white">
               See More
             </button> */}
+          </div>
+        </section>
+        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
+          <div className="flex justify-between items-center">
+            <h2 className="text-[28px] font-extrabold text-[#14192C]">
+              Academic Record Assessment
+            </h2>
+            <button className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[14px] rounded-md text-center flex justify-center items-center">
+              COMPLETE ACADEMIC RECORD ASSESSMENT
+            </button>
           </div>
         </section>
 
@@ -618,9 +667,9 @@ const Dashboard = () => {
           )}
         </section> */}
         {/* Placeholder for upcoming features */}
-        <section className="bg-gray-100 p-6 shadow rounded mb-6 border border-dashed border-gray-400">
+        <section className="bg-gray-100 p-6 shadow rounded border border-dashed border-gray-400 mb-10">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-500 mb-2">
+            <h2 className="text-xl font-bold text-gray-500 mb-2">
               Further development in progress...
             </h2>
             <p className="text-gray-500">

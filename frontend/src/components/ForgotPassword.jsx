@@ -1,96 +1,120 @@
 "use client";
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function ForgotPassword() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ email: "" });
+  const [error, setError] = useState({ email: false, api: "" });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setError({ email: false, api: "" }); // Clear error on change
+  };
 
   const isValidEmail = (email) => {
-    return /@(?:u-tad\.com|live\.u-tad\.com)$/.test(email);
+    const emailRegex = /^[a-zA-Z]+\.[a-zA-Z]+\d?@(live\.)?u-tad\.com$/;
+    return emailRegex.test(email);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isValidEmail(email)) {
-      setError('*the email is incorrect*');
+
+    if (!isValidEmail(formData.email)) {
+      setError({ email: true, api: "" });
       return;
     }
-    
+
     try {
       const res = await fetch("/api/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: formData.email }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to send recovery email");
+        setError({
+          email: false,
+          api: data.error || "Failed to send recovery email",
+        });
       } else {
         alert("Recovery email sent successfully!");
         router.push("/login");
       }
-    } catch (error) {
-      console.error("Password recovery error:", error);
-      setError("Failed to send recovery email");
+    } catch (err) {
+      console.error("Password recovery error:", err);
+      setError({
+        email: false,
+        api: "Something went wrong. Please try again.",
+      });
     }
   };
 
   return (
-    <div className="flex h-screen relative bg-white overflow-hidden">
-      <div className="w-[720px] h-screen bg-blue-600 flex justify-center items-center">
+    <div className="flex h-screen">
+      <div className="w-1/2 bg-custom-utad-logo flex justify-center items-center">
         <Image
           src="/u-tad-logo.png"
           alt="U-Tad Logo"
-          width={500}
-          height={500}
-          priority={true}
-          className="max-w-[80%] object-contain"
+          width={700}
+          height={600}
+          priority
+          className="max-h-full object-contain w-full"
         />
       </div>
 
-      <div className="w-[720px] relative">
-        <h1 className="absolute left-[187px] top-[219px] text-center text-[#14192C] text-[36px] font-montserrat font-[900] leading-[42px] break-words">
-          Account recovery
-        </h1>
+      <div className="w-1/2 flex flex-col justify-center items-center bg-white px-16">
+        <div className="text-center mt-10 mb-24">
+          <p className="text-custom-black font-montserrat font-black text-[36px]">
+            Account recovery
+          </p>
+          <p className="text-custom-black font-montserrat font-bold text-[20px] mt-1">
+            Insert your email to recover
+            <br />
+            your password
+          </p>
+        </div>
 
-        <p className="absolute w-[333px] left-[194px] top-[284px] text-center text-[#14192C] text-[20px] font-montserrat font-bold">
-          Insert your email to recover your password
-        </p>
-
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="w-full max-w-[700px] mb-40">
           <div className="relative">
-            <label 
-              className={`absolute left-[79px] top-[495px] w-[83px] h-[34px] text-[#6F7276] text-[24px] font-montserrat font-bold transition-opacity duration-200 ${
-                email ? 'opacity-0' : 'opacity-100'
-              }`}
-            >
-              Email
-            </label>
             <input
+              id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="absolute left-[67px] top-[495px] w-[562px] bg-transparent border-none outline-none text-[24px] font-montserrat text-[#6F7276]"
-              required
+              name="email"
+              autoComplete="email"
+              placeholder="Enter your U-Tad email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={`w-full border-b-4 py-2 px-3 font-montserrat text-[24px] font-bold focus:outline-none ${
+                error.email
+                  ? "border-red-500 text-red-500"
+                  : "border-custom-utad-logo text-custom-utad-logo"
+              }`}
             />
-            <div className="absolute left-[67px] top-[535px] w-[562px] h-[6px] bg-[#0065EF]" />
-            {error && (
-              <p className="absolute left-[75px] top-[547px] w-[590px] text-[#FF4929] text-[16px] font-montserrat font-bold leading-[22px]">
-                {error}
+            {error.email && (
+              <p className="text-red-500 text-[16px] font-bold mt-1">
+                *The email is incorrect*
+              </p>
+            )}
+            {error.api && (
+              <p className="text-red-500 text-[16px] font-semibold mt-1">
+                {error.api}
               </p>
             )}
           </div>
 
-          <button
-            type="submit"
-            className="absolute left-[167px] top-[608px] h-[60px] px-16 py-[18px] bg-[#0065EF] text-white font-montserrat font-bold text-[21px] rounded-lg uppercase leading-[21px] flex items-center justify-center"
-          >
-            Recover Password
-          </button>
+          <div className="flex justify-center mt-10">
+            <button
+              type="submit"
+              className="w-[373px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[21px] rounded-md text-center flex justify-center items-center"
+              aria-label="Recover password"
+            >
+              RECOVER PASSWORD
+            </button>
+          </div>
         </form>
       </div>
     </div>
