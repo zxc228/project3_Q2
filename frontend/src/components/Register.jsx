@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from 'react-hot-toast';
-
+import { toast } from "react-hot-toast";
 
 export default function Register() {
   const router = useRouter();
@@ -67,7 +66,7 @@ export default function Register() {
         studies: formData.studies,
       };
 
-    const res = await fetch("/api/auth/register",{
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -96,13 +95,19 @@ export default function Register() {
         />
       </div>
       <div className="w-1/2 flex flex-col justify-center items-center pb-5">
-        <div className="justify-self-start w-full pl-10">
-          <Link href="/" className="text-black text-5xl">
-            &#8592;
+        <div className="justify-self-start w-full pl-10 mt-5">
+          <Link href="/">
+            <Image
+              src="/svg/Return.svg"
+              alt="Logo"
+              width={27}
+              height={25}
+              priority={true}
+            />
           </Link>
         </div>
-        <div className="text-center mb-6">
-          <h1 className="text-[32px] font-900 font-montserrat">
+        <div className="text-center mb-10">
+          <h1 className="text-[36px] font-black font-montserrat">
             Create new profile
           </h1>
         </div>
@@ -110,7 +115,7 @@ export default function Register() {
           <form onSubmit={handleSubmit}>
             <div className="flex space-x-10">
               <button
-                className={`text-[16px] text-custom-utad-logo font-montserrat font-700 border-[2px] border-custom-utad-logo py-2 px-4 rounded block ${
+                className={`text-[15px] text-custom-utad-logo font-montserrat font-bold border-[2px] border-custom-utad-logo py-2 px-4 rounded block ${
                   formData.selectedRole === "student"
                     ? "bg-custom-utad-logo text-white"
                     : ""
@@ -121,7 +126,7 @@ export default function Register() {
                 Student
               </button>
               <button
-                className={`text-[16px] text-custom-utad-logo font-montserrat font-700 border-[2px] border-custom-utad-logo py-2 px-4 rounded block ${
+                className={`text-[16px] text-custom-utad-logo font-montserrat font-bold border-[2px] border-custom-utad-logo py-2 px-4 rounded block ${
                   formData.selectedRole === "teacher"
                     ? "bg-custom-utad-logo text-white"
                     : ""
@@ -140,11 +145,11 @@ export default function Register() {
                 value={formData.name}
                 placeholder="Enter your name"
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full border-b-4 py-2 px-3 font-montserrat text-[24px] font-bold focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <label
                 htmlFor="studies"
-                className="block text-black font-montserrat text-[24px] mt-10"
+                className="block text-black font-montserrat text-[24px] font-bold mt-10"
               >
                 Studies
               </label>
@@ -153,19 +158,30 @@ export default function Register() {
                 value={formData.studies}
                 onChange={handleInputChange}
                 disabled={formData.selectedRole === "teacher"}
-                className={`w-full border-2 px-3 py-2 mt-5 font-montserrat text-[16px] 
-    focus:outline-none rounded-md border-custom-utad-logo text-black
+                className={`w-full border-2 px-3 py-2 mt-5 font-montserrat text-[15px] font-bold text-[#2B2B2B]
+    focus:outline-none rounded-md border-custom-utad-logo
     ${
       formData.selectedRole === "teacher"
         ? "bg-gray-200 cursor-not-allowed"
         : ""
     }`}
               >
-                <option value="">Select your studies</option>
-                <option value="deg_data">
+                <option
+                  value=""
+                  className="text-[15px] font-bold text-[#2B2B2B]"
+                >
+                  Select your studies
+                </option>
+                <option
+                  value="deg_data"
+                  className="text-[15px] font-bold text-[#0065EF]"
+                >
                   B.S. COMPUTER SCIENCE - DATA ENGINEERING
                 </option>
-                <option value="deg_cyber">
+                <option
+                  value="deg_cyber"
+                  className="text-[15px] font-bold text-[#0065EF]"
+                >
                   B.S. COMPUTER SCIENCE - CYBERSECURITY
                 </option>
               </select>
@@ -177,10 +193,10 @@ export default function Register() {
                 placeholder="Enter your U-Tad email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full mt-10 border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full mt-10 border-b-4 py-2 px-3 font-montserrat text-[24px] font-bold focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               ></input>
               <p
-                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] font-bold mt-1 transition-opacity duration-300 ${
                   errors.email ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -194,10 +210,10 @@ export default function Register() {
                 value={formData.password}
                 placeholder="Enter your password"
                 onChange={handleInputChange}
-                className="w-full mt-5 border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full mt-5 border-b-4 py-2 px-3 font-montserrat text-[24px] font-bold focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <p
-                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] font-bold mt-1 transition-opacity duration-300 ${
                   errors.password ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -212,10 +228,10 @@ export default function Register() {
                 value={formData.confirmPassword}
                 placeholder="Confirm your password"
                 onChange={handleInputChange}
-                className="w-full mt-5 border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full mt-5 border-b-4 py-2 px-3 font-montserrat text-[24px] font-bold focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <p
-                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[16px] font-bold mt-1 transition-opacity duration-300 ${
                   errors.confirmPassword ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -234,7 +250,7 @@ export default function Register() {
           </form>
 
           <div className="text-center mt-10">
-            <p className="text-[22px]">
+            <p className="text-[22px] font-semibold">
               A confirmation code will be sent to your email
             </p>
           </div>

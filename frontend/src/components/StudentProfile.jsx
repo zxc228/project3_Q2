@@ -4,21 +4,21 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Explanation from "./Explanation";
 
 export default function StudentProfile() {
-
   const router = useRouter();
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/");
-      }
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+    }
+  }, []);
   const [userData, setUserData] = useState({
-    name: "Nombre Apellidos",
+    name: "Name Surnames",
     location: "Location",
-    degree: "Degree",
-    year: "Year",
+    degree: "Degree you are studying",
+    year: "Year of graduation",
     link: "mylink.com",
   });
 
@@ -27,6 +27,14 @@ export default function StudentProfile() {
   const [experience, setExperience] = useState([]);
   const [profileId, setProfileId] = useState(null);
   const [token, setToken] = useState(null);
+
+  const [profileSteps, setProfileSteps] = useState([
+    { label: "Step 1", completed: false }, // Name and education
+    { label: "Step 2", completed: false }, // About me
+    { label: "Step 3", completed: false }, // Languages
+    { label: "Step 4", completed: false }, // Upload CV
+    { label: "Step 5", completed: false }, // Academic record
+  ]);
 
   const skills = [
     "Data Mining",
@@ -44,13 +52,19 @@ export default function StudentProfile() {
 
   let CVUploaded = false;
 
-  const profileSteps = [
-    { label: "Step 1", completed: false },
-    { label: "Step 2", completed: false },
-    { label: "Step 3", completed: false },
-    { label: "Step 4", completed: false },
-    { label: "Step 5", completed: false },
-  ];
+  const handleHoverStart = () => {
+    clearTimeout(hoverTimeout.current);
+    setIsHovered(true);
+  };
+
+  const handleHoverEnd = () => {
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 3000);
+  };
+
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeout = useRef(null);
 
   const cvInputRef = useRef(null);
   const academicInputRef = useRef(null);
@@ -74,8 +88,8 @@ export default function StudentProfile() {
   };
 
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId');
-    const storedToken = localStorage.getItem('token');
+    const storedProfileId = localStorage.getItem("profileId");
+    const storedToken = localStorage.getItem("token");
 
     setProfileId(storedProfileId);
     setToken(storedToken);
@@ -85,7 +99,7 @@ export default function StudentProfile() {
   const retrieveUserData = async () => {
     try {
       const response = await fetch(`/api/profiles/profile/${profileId}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -117,14 +131,17 @@ export default function StudentProfile() {
     };
 
     try {
-      const response = await fetch(`/api/profiles/profile/${profileId}/profile-data`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(profileData),
-      });
+      const response = await fetch(
+        `/api/profiles/profile/${profileId}/profile-data`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(profileData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error updating profile data: ${response.statusText}`);
@@ -143,29 +160,33 @@ export default function StudentProfile() {
     }
   }, [profileId, token]);
 
-  // Calculate the completion percentage based on completed steps, user should have modified default values
-  if (
-    userData.name !== "Name Surname" &&
-    userData.location !== "Location" &&
-    userData.degree !== "Degree" &&
-    userData.year !== "Year" &&
-    userData.link !== "mylink.com"
-  ) {
-    profileSteps[0].completed = true;
-    if (experience.length > 0) {
-      profileSteps[1].completed = true;
-      if (languages.length > 0) {
-        profileSteps[2].completed = true;
-        if (CVUploaded) {
-          profileSteps[3].completed = true;
-          if (description !== "") {
-            profileSteps[4].completed = true;
-          }
-        }
-      }
-    }
-  }
+  useEffect(() => {
+    const updatedSteps = [...profileSteps];
 
+    // Step 1
+    updatedSteps[0].completed =
+      userData.name !== "Name Surnames" &&
+      userData.location !== "Location" &&
+      userData.degree !== "Degree you are studying" &&
+      userData.year !== "Year of graduation" &&
+      userData.link !== "mylink.com";
+
+    // Step 2
+    updatedSteps[1].completed = aboutMe.trim() !== "";
+
+    // Step 3
+    updatedSteps[2].completed = languages.length > 0;
+
+    // Step 4
+    updatedSteps[3].completed = CVUploaded;
+
+    // Step 5
+    updatedSteps[4].completed = experience.length > 0;
+
+    setProfileSteps(updatedSteps);
+  }, [userData, aboutMe, languages, CVUploaded, experience]);
+
+  // Completion stats
   const completedCount = profileSteps.filter((s) => s.completed).length;
   const completionPercentage = Math.round(
     (completedCount / profileSteps.length) * 100
@@ -178,7 +199,7 @@ export default function StudentProfile() {
           <Image src="/u-tad-nobg.png" width={160} height={50} alt="Logo" />
           <nav className="mt-20 space-y-6 flex flex-col">
             <Link
-              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
               href={"/student-profile"}
             >
               <Image
@@ -190,7 +211,7 @@ export default function StudentProfile() {
               <span>Profile</span>
             </Link>
             <Link
-              className="relative text-white font-bold text-[18px] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
+              className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
               href={"/dashboard"}
             >
               <Image
@@ -203,10 +224,19 @@ export default function StudentProfile() {
             </Link>
           </nav>
         </div>
-        <button onClick={() => {
-            localStorage.clear(); 
-            router.push("/"); 
-          }} className="text-white font-bold text-[18px] text-left">
+        <button
+          onClick={() => {
+            localStorage.clear();
+            router.push("/");
+          }}
+          className="relative text-white font-bold text-[18px] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[3px] after:bg-white after:transition-all after:duration-300 hover:after:w-full flex items-center gap-2"
+        >
+          <Image
+            src={"/svg/SignOut.svg"}
+            width={25}
+            height={25}
+            alt="Sign Out"
+          />
           Sign out
         </button>
       </aside>
@@ -232,7 +262,7 @@ export default function StudentProfile() {
                 }
               />
               <input
-                className="text-[21px] font-600 text-custom-utad-logo focus:outline-none"
+                className="text-[21px] font-semibold text-custom-utad-logo focus:outline-none"
                 value={userData.location}
                 placeholder="Madrid, Spain"
                 onChange={(e) =>
@@ -313,10 +343,55 @@ export default function StudentProfile() {
             <div className="flex justify-between w-full mt-2">
               {profileSteps.map((step, index) => (
                 <div key={index} className="text-center">
-                  <p className="text-[16px] font-500">{step.label}</p>
+                  <p className="text-[16px] font-normal text-[#14192C]">
+                    {step.label}
+                  </p>
                 </div>
               ))}
             </div>
+          </div>
+          <button
+            onMouseEnter={handleHoverStart}
+            onMouseLeave={handleHoverEnd}
+            aria-label="Explanation"
+          >
+            <Image
+              src={"/svg/_/Big.svg"}
+              alt="Explanation"
+              width={20}
+              height={20}
+            />
+          </button>
+          <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
+            <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
+              Steps needed to improve your profile
+            </h1>
+            <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+              <strong>Step 1:</strong> Fill your name and education
+              <br />
+              <strong>Step 2:</strong> Fill your about me section
+              <br />
+              <strong>Step 3:</strong> Fill your languages spoken
+              <br />
+              <strong>Step 4:</strong> Upload your CV
+              <br />
+              <strong>Step 5:</strong> Upload your academic record
+            </p>
+          </Explanation>
+        </div>
+
+        <div className="mt-10 w-full border rounded-md p-4 border-custom-utad-logo">
+          <p className="font-bold mb-4 text-[21px] text-custom-gray">
+            About me...
+          </p>
+          <div className="text-[18px] font-400">
+            <textarea
+              className="w-full focus:outline-none resize-none"
+              rows={5}
+              value={aboutMe}
+              onChange={(e) => setAboutMe(e.target.value)}
+              placeholder="Write something about yourself..."
+            />
           </div>
         </div>
 
@@ -399,20 +474,6 @@ export default function StudentProfile() {
               />
               <p className="mt-5">UPLOAD ACADEMIC RECORD</p>
             </button>
-          </div>
-        </div>
-        <div className="mt-10 w-full border rounded-md p-4 border-custom-utad-logo">
-          <p className="font-bold mb-4 text-[21px] text-custom-gray">
-            About me...
-          </p>
-          <div className="text-[18px] font-400">
-            <textarea
-              className="w-full focus:outline-none resize-none"
-              rows={5}
-              value={aboutMe}
-              onChange={(e) => setAboutMe(e.target.value)}
-              placeholder="Write something about yourself..."
-            />
           </div>
         </div>
 
@@ -524,7 +585,6 @@ export default function StudentProfile() {
             Skills, experience, and more will be available in upcoming updates.
           </p>
         </div>
-
       </div>
     </div>
   );

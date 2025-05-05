@@ -6,7 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 import Explanation from "./Explanation";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 export default function Login() {
   const router = useRouter();
@@ -74,14 +74,13 @@ export default function Login() {
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error?.message || data.error || "Login failed");
-
-        
       } else {
         toast.success("Login successful");
         localStorage.setItem("userId", data.user.id);
         localStorage.setItem("token", data.token);
         const nameRaw = data.user.id;
-        const profileId = "profile_" + nameRaw.trim().toLowerCase().replace(/\s+/g, "_");
+        const profileId =
+          "profile_" + nameRaw.trim().toLowerCase().replace(/\s+/g, "_");
         localStorage.setItem("profileId", profileId);
         console.log("data", data);
         if (data.user.role === "TEACHER") {
@@ -89,14 +88,13 @@ export default function Login() {
         } else {
           router.push("/dashboard");
         }
-    
       }
     }
   };
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 bg-blue-600 flex justify-center items-center">
+      <div className="w-1/2 bg-custom-utad-logo flex justify-center items-center">
         <Image
           src="/u-tad-logo.png"
           alt="U-Tad Logo"
@@ -109,35 +107,38 @@ export default function Login() {
 
       <div className="w-1/2 flex flex-col justify-center items-center bg-white px-16">
         <div className="text-center mt-auto mb-10">
-          <p className="text-custom-black font-montserrat font-bold text-[46px]">
+          <p className="text-custom-black font-montserrat font-black text-[36px]">
             Welcome to U-PaFi{" "}
             <button
-              className="inline-block"
+              className="inline-block items-start"
               onMouseEnter={handleHoverStart}
               onMouseLeave={handleHoverEnd}
               aria-label="Explanation"
             >
               <Image
-                src={"/explanation.png"}
+                src={"/svg/_/Big.svg"}
                 alt="Explanation"
                 width={20}
                 height={20}
               />
             </button>
           </p>
-          <p className="text-custom-black font-montserrat font-bold text-[20px] mt-1">
+          <p className="text-custom-black font-montserrat font-semibold text-[22px] mt-1">
             please enter your details
           </p>
         </div>
 
         <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
-          <h1 className="text-custom-black font-montserrat font-[800] text-[28px]">
+          <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
             What is U-TAD Path Finder (U-PaFi)?
           </h1>
-          <p className="text-custom-black font-[400] font-montserrat text-[14px] mt-5">
-          U-PaFi is a career guidance platform that helps U-TAD students identify the best career paths based on their grades and skills. We recommend personalized career tracks, show which skills to focus on, and generate reports to share with your tutor. Plan your professional future and improve your employability with U-PaFi!.
+          <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+            U-PaFi is a career guidance platform that helps U-TAD students
+            identify the best career paths based on their grades and skills. We
+            recommend personalized career tracks, show which skills to focus on,
+            and generate reports to share with your tutor. Plan your
+            professional future and improve your employability with U-PaFi!
           </p>
-          
 
           <div className="flex justify-center mt-4">
             <Image
@@ -161,10 +162,10 @@ export default function Login() {
                 placeholder="Enter your U-Tad email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 font-montserrat text-[22px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full border-b-4 py-2 px-3 font-montserrat text-[22px] font-semibold focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <p
-                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[14px] font-bold mt-1 transition-opacity duration-300 ${
                   errors.email ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -181,7 +182,7 @@ export default function Login() {
                 value={formData.password}
                 placeholder="Enter your password"
                 onChange={handleInputChange}
-                className="w-full border-b-4 py-2 px-3 pr-10 font-montserrat text-[22px] focus:outline-none border-custom-utad-logo text-custom-utad-logo"
+                className="w-full border-b-4 py-2 px-3 pr-10 font-montserrat text-[22px] font-semibold focus:outline-none border-custom-utad-logo text-custom-utad-logo"
               />
               <button
                 type="button"
@@ -191,7 +192,7 @@ export default function Login() {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
               <p
-                className={`text-red-500 text-[16px] mt-1 transition-opacity duration-300 ${
+                className={`text-red-500 text-[14px] font-bold mt-1 transition-opacity duration-300 ${
                   errors.password ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -202,7 +203,7 @@ export default function Login() {
             <div className="flex justify-center mt-10">
               <button
                 type="submit"
-                className="w-[235px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[24px] rounded-md text-center flex justify-center items-center"
+                className="w-[235px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[20px] rounded-md text-center flex justify-center items-center"
                 aria-label="Log in"
               >
                 LOG IN
@@ -212,13 +213,13 @@ export default function Login() {
         </div>
 
         <div className="mt-auto pb-10 text-center">
-          <p className="text-custom-dark-grey font-montserrat font-bold text-[24px]">
-            <Link href="/forgot-password">forgot password?</Link>
+          <p className="text-custom-dark-grey font-montserrat font-semibold text-[22px]">
+            <Link href="/forgot-password">Forgot password?</Link>
           </p>
-          <p className="text-custom-dark-grey font-montserrat font-bold text-[24px]">
+          <p className="text-custom-dark-grey font-montserrat font-semibold text-[22px]">
             <Link href="/register">
-              don’t have an account already?{" "}
-              <span className="font-[800]">Sign up</span>
+              Don’t have an account already?{" "}
+              <span className="font-bold">Sign up</span>
             </Link>
           </p>
         </div>
