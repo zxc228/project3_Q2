@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
@@ -11,24 +11,19 @@ import { toast } from "react-hot-toast";
 export default function Login() {
   const router = useRouter();
 
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeout = useRef(null);
+  const [isOpenExplanation, setIsOpenExplanation] = useState(false);
+  const [positionExplanation, setPositionExplanation] = useState({
+    top: 0,
+    left: 0,
+  });
 
-  useEffect(() => {
-    const handler = () => setIsHovered(false);
-    window.addEventListener("closeExplanation", handler);
-    return () => window.removeEventListener("closeExplanation", handler);
-  }, []);
-
-  const handleHoverStart = () => {
-    clearTimeout(hoverTimeout.current);
-    setIsHovered(true);
-  };
-
-  const handleHoverEnd = () => {
-    hoverTimeout.current = setTimeout(() => {
-      setIsHovered(false);
-    }, 5000);
+  const handleToggleExplanation = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPositionExplanation({
+      top: rect.bottom + window.scrollY + 10,
+      left: rect.left + window.scrollX - 500,
+    });
+    setIsOpenExplanation((prev) => !prev);
   };
 
   const [formData, setFormData] = useState({
@@ -111,8 +106,7 @@ export default function Login() {
             Welcome to U-PaFi{" "}
             <button
               className="inline-block items-start"
-              onMouseEnter={handleHoverStart}
-              onMouseLeave={handleHoverEnd}
+              onClick={handleToggleExplanation}
               aria-label="Explanation"
             >
               <Image
@@ -128,7 +122,7 @@ export default function Login() {
           </p>
         </div>
 
-        <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
+        <Explanation isOpen={isOpenExplanation} position={positionExplanation}>
           <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
             What is U-TAD Path Finder (U-PaFi)?
           </h1>

@@ -5,6 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Explanation from "@/components/Explanation";
 
 export default function TutorProfile() {
   const router = useRouter();
@@ -17,6 +18,21 @@ export default function TutorProfile() {
   const [selectedDescription, setSelectedDescription] = useState("");
   const [selectedFitness, setSelectedFitness] = useState("");
   const [skills, setSkills] = useState([]);
+
+  const [isOpenExplanation, setIsOpenExplanation] = useState(false);
+  const [positionExplanation, setPositionExplanation] = useState({
+    top: 0,
+    left: 0,
+  });
+
+  const handleToggleExplanation = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPositionExplanation({
+      top: rect.bottom + window.scrollY - 600,
+      left: rect.left + window.scrollX - 2400,
+    });
+    setIsOpenExplanation((prev) => !prev);
+  };
 
   const loadDescription = async (careerTypeId) => {
     const token = localStorage.getItem("token");
@@ -142,16 +158,20 @@ export default function TutorProfile() {
             <div className="flex flex-col">
               <h1 className="text-[32px] font-bold">Career Recommendations</h1>
               <div className="mt-4">
-                <label className="block text-[16px] font-semibold mb-2">
+                <label className="block text-[24px] font-bold mb-2">
                   Select Student:
                 </label>
                 <select
                   value={selectedStudent}
                   onChange={(e) => setSelectedStudent(e.target.value)}
-                  className="border rounded px-3 py-2"
+                  className="focus:outline-none rounded px-3 py-2 text-[16px] font-bold text-custom-utad-logo"
                 >
                   {students.map((student) => (
-                    <option key={student.profileId} value={student.profileId}>
+                    <option
+                      key={student.profileId}
+                      value={student.profileId}
+                      className="text-[16px] font-bold text-custom-utad-logo"
+                    >
                       {student.userId} — {student.email}
                     </option>
                   ))}
@@ -252,15 +272,79 @@ export default function TutorProfile() {
               {selectedDescription}
             </p>
             <p className="text-[16px] font-normal text-[#383B42] mb-4">
-              He/She is {selectedFitness} fit for this position.
+              He/She are <strong>{selectedFitness}</strong> fit for this
+              position.
             </p>
+            <div className="flex justify-between mb-1">
+              <p className="font-bold text-[24px] mb-2">Skills</p>
+              <div className="flex items-center text-[16px] font-bold text-[#14192C]">
+                Current level | Desired
+                <div className="relative ml-2">
+                  <button
+                    onClick={handleToggleExplanation}
+                    aria-label="Explanation"
+                  >
+                    <Image
+                      src={"/svg/_/Big.svg"}
+                      alt="Explanation"
+                      width={20}
+                      height={20}
+                    />
+                  </button>
+                  <Explanation
+                    isOpen={isOpenExplanation}
+                    position={positionExplanation}
+                  >
+                    <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
+                      What do these values represent?
+                    </h1>
+                    <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+                      <strong>Current level:</strong> Your current skill level
+                      in this area.
+                      <br />
+                      <strong>Desired level:</strong> The level you should aim
+                      for to be competitive in this field.
+                      <br />
+                      <strong>Fitness level:</strong> A percentage indicating
+                      how well your skills match the requirements of the
+                      position.
+                    </p>
+                  </Explanation>
+                </div>
+              </div>
+            </div>
 
             <ul className="space-y-3">
               {skills.map((skill, i) => (
                 <li key={i} className="flex items-center gap-4">
-                  <span className="w-48 font-normal text-[21px] text-[#14192C]">
-                    {skill.name}
-                  </span>
+                  <div
+                    className="w-72 font-normal text-[21px] text-[#14192C] flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis"
+                    title={skill.name}
+                  >
+                    {/* Conditional SVG image icons */}
+                    {skill.current === 5 && (
+                      <img
+                        src="/svg/Badge/Gold.svg"
+                        alt="Expert"
+                        className="w-10 h-10"
+                      />
+                    )}
+                    {skill.current > 4 && skill.current < 5 && (
+                      <img
+                        src="/svg/Badge/Silver.svg"
+                        alt="Advanced"
+                        className="w-10 h-10"
+                      />
+                    )}
+                    {skill.current >= 3 && skill.current <= 4 && (
+                      <img
+                        src="/svg/Badge/Bronze.svg"
+                        alt="Intermediate"
+                        className="w-10 h-10"
+                      />
+                    )}
+                    <span className="truncate">{skill.name}</span>
+                  </div>
                   <div className="relative bg-gray-200 h-3 flex-1 rounded">
                     <div
                       className="absolute top-[0px] w-3 h-3 bg-blue-700 rounded-full z-10"

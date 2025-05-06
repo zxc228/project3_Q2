@@ -1,371 +1,403 @@
 "use client";
 
-import React, { useState } from "react";
-import skillsData from "../app/app/Research.json"; // Adjust path as needed
+import { useEffect, useState } from "react";
 
-const SelfAssessmentModal = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState(1);
-  const [careerField, setCareerField] = useState("");
-  const [jobType, setJobType] = useState(""); // 'JOB', 'INTERNSHIP', or 'NOT_LOOKING'
-  const [userSkills, setUserSkills] = useState([]);
-  const [submittedDiplomas, setSubmittedDiplomas] = useState([]);
-  const [pendingDiplomaFile, setPendingDiplomaFile] = useState(null);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
+export default function SelfAssessmentModal({ isOpen, onClose }) {
+  function getMedal(value) {
+    if (value >= 4.5) return "/svg/Badge/Gold.svg";
+    if (value >= 3.5) return "/svg/Badge/Silver.svg";
+    if (value >= 2.5) return "/svg/Badge/Bronze.svg";
+    return "";
+  }
+
+  const [currentStep, setCurrentStep] = useState(1);
+
+  const [careerFields, setCareerFields] = useState([]);
+  const [careerTypes, setCareerTypes] = useState([]);
+  const [loadingSkills, setLoadingSkills] = useState(false);
+
+  const [assessmentData, setAssessmentData] = useState({
+    careerFieldId: "",
+    careerTypeId: "",
+    jobType: "",
+    skills: [],
+    justifications: [],
+  });
+
+  useEffect(() => {
+    (async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      try {
+        const res = await fetch("/api/careers/fields", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch career fields");
+
+        const data = await res.json();
+        setCareerFields(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, []);
+
+  const handleFieldChange = async (e) => {
+    const fieldId = e.target.value;
+    setAssessmentData((prev) => ({
+      ...prev,
+      careerFieldId: fieldId,
+      careerTypeId: "",
+      skills: [],
+    }));
+    setCareerTypes([]);
+
+    if (!fieldId) return; // nothing chosen yet
+    const token = localStorage.getItem("token");
+    if (!token) return console.error("No token found");
+
+    try {
+      const res = await fetch(`/api/careers/fields/${fieldId}/types`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch career types");
+
+      const types = await res.json();
+      setCareerTypes(Array.isArray(types) ? types : []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleTypeChange = async (e) => {
+    const careerTypeId = e.target.value;
+    setAssessmentData((prev) => ({ ...prev, careerTypeId, skills: [] }));
+    if (!careerTypeId) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return console.error("No token found");
+
+    try {
+      setLoadingSkills(true);
+
+      const res = await fetch(`/api/careers/skills/${careerTypeId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch career skills");
+
+      const skillsArr = await res.json();
+      setAssessmentData((prev) => ({
+        ...prev,
+        skills: skillsArr.map((s) => ({
+          id: s.skillid,
+          name: s.skillname,
+          description: s.skilldescription,
+          current: 0,
+        })),
+      }));
+      setCurrentStep(2);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingSkills(false);
+    }
+  };
+
+  const handleFinish = async () => {
+    const token = localStorage.getItem("token");
+    const profileId = localStorage.getItem("profileId");
+    if (!token || !profileId) return;
+
+    const payload = {
+      skills: assessmentData.skills.map((s) => ({
+        skillId: s.id,
+        skillLevel: s.current,
+      })),
+    };
+
+    try {
+      const res = await fetch(`/api/skills/profiles/${profileId}/skills`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to update skills");
+      console.log("Skills successfully updated in profile.");
+      onClose();
+    } catch (err) {
+      console.error("Skill update error:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setAssessmentData({
+        careerFieldId: "",
+        careerTypeId: "",
+        jobType: "",
+        skills: [],
+        justifications: [],
+      });
+      setCurrentStep(1);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const getSkillsFromJson = (careerField, type) => {
-    if (
-      skillsData.career_fields[careerField] &&
-      skillsData.career_fields[careerField][type]
-    ) {
-      return Object.entries(skillsData.career_fields[careerField][type]).map(
-        ([name, expected]) => ({ name, expected_level: expected, value: 0, file: null })
-      );
-    }
-    return [];
-  };
-
-  const handleContinueToStep3 = () => {
-    const pathMap = {
-      JOB: "Job",
-      INTERNSHIP: "Internship"
-    };
-  
-    const path = pathMap[jobType];
-    if (careerField && path) {
-      const extracted = getSkillsFromJson(careerField, path);
-      setUserSkills(extracted);
-      setStep(3);
-    }
-  };
-  
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-[1012px] h-[522px] rounded-[14.24px] border-2 border-blue-500 shadow-xl relative p-10 flex flex-col justify-between">
-
-        {/* Close Button */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-white w-[90%] max-w-3xl h-[70vh] overflow-y-auto rounded-2xl p-10 relative shadow-2xl animate-fade-in-up">
         <button
-        onClick={() => setShowExitConfirm(true)}
-        className="absolute top-4 right-6 text-blue-500 text-2xl font-bold"
-        >✕</button>
+          onClick={onClose}
+          className="absolute top-4 right-4 text-2xl transition-all duration-200 hover:scale-105"
+        >
+          <img src="/svg/X.svg" alt="Close" className="w-6 h-6" />
+        </button>
+        {currentStep === 1 && (
+          <div className="flex flex-col items-center justify-between h-full">
+            <div className="w-full max-w-[600px] text-center">
+              <h1 className="text-[28px] font-bold mb-4 text-[#14192C]">
+                What Career Field do you want to specialize in?
+              </h1>
+              <select
+                value={assessmentData.careerFieldId}
+                onChange={handleFieldChange}
+                className="w-full border-2 border-[#0065EF] text-[#0065EF] py-2 px-4 rounded mb-10 text-[15px] font-bold focus:outline-none text-center"
+              >
+                <option value="" className="text-[15px] font-bold text-center">
+                  I DON'T KNOW WHERE I WANT TO SPECIALIZE
+                </option>
+                {careerFields.map((f) => (
+                  <option
+                    key={f.id}
+                    value={f.id}
+                    className="text-[#0065EF] text-[15px] font-bold text-center"
+                  >
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+              {careerTypes.length > 0 && (
+                <div>
+                  <h1 className="text-[28px] font-bold mb-6 text-[#14192C]">
+                    Are you looking for a job or an internship?
+                  </h1>
+                  <select
+                    value={assessmentData.careerTypeId}
+                    onChange={handleTypeChange}
+                    className="w-full border-2 border-[#0065EF] text-[#0065EF] py-2 px-4 rounded mb-10 text-[15px] font-bold focus:outline-none text-center"
+                  >
+                    <option
+                      value=""
+                      className="text-[15px] font-bold text-center"
+                    >
+                      Select Career Type
+                    </option>
+                    {careerTypes.map((t) => (
+                      <option
+                        key={t.id}
+                        value={t.id}
+                        className="text-[#0065EF] text-[15px] font-bold text-center"
+                      >
+                        {t.type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
+              {loadingSkills && (
+                <p className="mt-6 text-sm text-gray-500">Loading skills…</p>
+              )}
+            </div>
+          </div>
+        )}
 
-        {/* STEP 1 */}
-        {step === 1 && (
-          <div className="flex flex-col items-center justify-center w-full h-full max-w-md mx-auto">
-            <h2 className="text-center text-lg md:text-2xl font-semibold text-black mb-10">
-              What Career Field do you want <br /> to specialize in?
+        {/* ── STEP 2 – Skills self-assessment ───────────── */}
+        {currentStep === 2 && (
+          <div className="flex flex-col">
+            <h2 className="text-[24px] text-[#14192C] font-bold mb-10">
+              Rate Your Skills
             </h2>
 
-            <select
-              value={careerField}
-              onChange={(e) => setCareerField(e.target.value)}
-              className="w-full border border-blue-500 text-blue-500 py-2 px-4 rounded mb-10"
-            >
-              <option value="">Select a field</option>
-              {Object.keys(skillsData.career_fields).map((field) => (
-                <option key={field} value={field}>{field}</option>
-              ))}
-            </select>
-
-            <div className="w-full flex justify-end">
-              <button
-                className="bg-blue-500 text-white py-2 px-6 rounded text-sm font-semibold"
-                onClick={() => setStep(2)}
-              >
-                CONTINUE
-              </button>
-            </div>
-          </div>
-        )}
-        {/* STEP 2 */}
-        {step === 2 && (
-          <div className="flex flex-col justify-between w-full h-full">
-            <div className="text-center mt-10">
-              <h2 className=" text-center p-12 text-lg md:text-2xl font-semibold text-black mb-10">
-                Are you looking for a job or an internship?
-              </h2>
-
-              <div className="flex justify-center gap-4 mb-10">
-                {["JOB", "INTERNSHIP", "I'M NOT LOOKING"].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setJobType(type)}
-                    className={`px-4 py-2 rounded border font-semibold ${
-                      jobType === type
-                        ? "bg-blue-600 text-white"
-                        : "border-blue-600 text-blue-600"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-between w-full px-2">
-              <button
-                onClick={() => setStep(1)}
-                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              >
-                RETURN
-              </button>
-              
-              <button
-                className="bg-blue-600 text-white py-2 px-6 rounded text-sm font-semibold"
-                onClick={handleContinueToStep3}
-              >
-                CONTINUE
-              </button>
-            </div>
-          </div>
-        )}
-        {/* STEP 3 */}
-        {step === 3 && (
-          <div className="flex flex-col justify-between h-full w-full overflow-auto scrollbar-hide">
-            <div>
-              <h2 className="text-xl font-bold text-black mb-6">Field: {careerField}</h2>
-              <div className="grid grid-cols-3 gap-x-6 text-sm font-semibold text-gray-600 mb-2">
-                <span></span>
-                <span>             </span>
-                <span className="text-right text-black font-semibold">Current Level</span>
-              </div>
-
-              {userSkills.map((skill, index) => (
-                <div key={index} className="flex items-center gap-4 mb-4">
-                  <button
-                    onClick={() => document.getElementById(`file-${index}`).click()}
-                    className="text-gray-300 hover:text-gray-700 text-xl w-6"
-                    title="Upload certificate"
-                  >
-                    +
-                  </button>
-                  <span className="w-48 font-medium text-black">{skill.name}</span>
-                  <div className="flex-1 relative bg-gray-300 h-5 rounded-full">
-                    <div
-                      className="absolute top-[-6px]"
-                      style={{
-                        left: `${(skill.value / 5) * 100}%`,
-                        transform: "translate(10%, 50%)",
-                      }}
-                    >
-                      <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+            {assessmentData.skills.length === 0 ? (
+              <p className="text-gray-500 text-center">No skills available.</p>
+            ) : (
+              <div className="flex flex-col gap-6 overflow-y-auto">
+                {assessmentData.skills.map((skill, idx) => (
+                  <div key={skill.id} className="flex items-center gap-4">
+                    <div className="w-60 flex items-center gap-2 font-medium">
+                      <div className="flex items-center">
+                        {getMedal(skill.current) && (
+                          <img
+                            src={getMedal(skill.current)}
+                            alt={`${skill.name} skill level medal`}
+                            className="w-10 h-10 inline-block mr-2"
+                          />
+                        )}
+                        <span className="text-[#14192C] text-[21px] font-normal">
+                          {skill.name}
+                        </span>
+                      </div>
                     </div>
+
                     <input
                       type="range"
                       min="0"
                       max="5"
                       step="0.5"
-                      value={skill.value}
+                      value={skill.current}
                       onChange={(e) => {
-                        const updated = [...userSkills];
-                        updated[index].value = parseFloat(e.target.value);
-                        setUserSkills(updated);
+                        const updated = [...assessmentData.skills];
+                        updated[idx].current = parseFloat(e.target.value);
+                        setAssessmentData((prev) => ({
+                          ...prev,
+                          skills: updated,
+                        }));
                       }}
-                      className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                      className="flex-1 h-2 bg-gray-200 rounded-lg accent-blue-600"
                     />
+                    <div className="w-20 text-center font-semibold">
+                      {skill.current}
+                    </div>
                   </div>
-                  <span className=" w-8 text-right text-black font-semibold">{skill.value}</span>
-                  <input
-                    type="file"
-                    id={`file-${index}`}
-                    onChange={(e) => {
-                      const updated = [...userSkills];
-                      updated[index].file = e.target.files[0];
-                      setUserSkills(updated);
-                    }}
-                    className="hidden"
-                  />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
-            <div className="flex justify-between pt-4">
+            <div className="flex gap-4 mt-10">
               <button
-                onClick={() => setStep(2)}
-                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setCurrentStep(3)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md transition-all duration-200 hover:scale-105"
               >
-                RETURN
-              </button>
-
-              <button
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
-                onClick={() => setStep(4)}
-              >
-                NEXT
+                CONTINUE
               </button>
             </div>
           </div>
         )}
-{/* STEP 4 */}
-{step === 4 && (
-  <div className="flex flex-col gap-4 h-full w-full overflow-auto scrollbar-hide">
-    <h2 className="text-center text-lg md:text-2xl font-semibold text-black mb-4">
-      Add skill justifications
-    </h2>
 
-    {/* Justification Input Form (Single) */}
-    <div className="border rounded-xl p-4 shadow bg-white relative">
-      <div className="flex justify-between items-center">
-        <span className="font-bold text-sm text-gray-800">NAME OF THE COURSE</span>
-      </div>
+        {/* ── STEP 3 – Justifications ───────────────────── */}
+        {currentStep === 3 && (
+          <div className="flex flex-col">
+            <h2 className="text-[24px] text-[#14192C] font-bold mb-10">
+              Add Skill Justifications
+            </h2>
 
-      <input
-        type="text"
-        placeholder="Website"
-        id="new-website"
-        className="w-full border-b border-blue-500 py-1 mt-2 mb-4 outline-none text-sm"
-      />
-      <input
-        type="text"
-        placeholder="Briefly describe this course and what you learned"
-        id="new-description"
-        className="w-full border-b border-blue-500 py-1 mb-4 outline-none text-sm"
-      />
+            {assessmentData.justifications.length === 0 && (
+              <p className="text-gray-500 text-center">
+                No justifications added yet.
+              </p>
+            )}
 
-      <div className="bg-gray-200 rounded-md h-32 flex items-center justify-center mb-4 cursor-pointer">
-        <label htmlFor="new-upload" className="cursor-pointer text-center text-gray-600">
-          ⬆️ <br />
-          UPLOAD DIPLOMA
-        </label>
-        <input
-  type="file"
-  id="new-upload"
-  className="hidden"
-  onChange={(e) => {
-    if (e.target.files.length > 0) {
-      setPendingDiplomaFile(e.target.files[0]);
-    }
-  }}
-/>
+            <div className="space-y-6 mb-8">
+              {assessmentData.justifications.map((j, idx) => (
+                <div
+                  key={idx}
+                  className="border-2 border-blue-500 rounded-lg p-4 bg-white"
+                >
+                  {/* -- title/url/description */}
+                  <input
+                    type="text"
+                    placeholder="Course Title"
+                    value={j.title}
+                    onChange={(e) => {
+                      const upd = [...assessmentData.justifications];
+                      upd[idx].title = e.target.value;
+                      setAssessmentData((p) => ({ ...p, justifications: upd }));
+                    }}
+                    className="w-full border-b-2 border-blue-600 mb-2 font-semibold"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Website URL"
+                    value={j.url}
+                    onChange={(e) => {
+                      const upd = [...assessmentData.justifications];
+                      upd[idx].url = e.target.value;
+                      setAssessmentData((p) => ({ ...p, justifications: upd }));
+                    }}
+                    className="w-full border-b-2 border-blue-600 mb-2 text-blue-600 font-semibold"
+                  />
+                  <textarea
+                    rows={2}
+                    placeholder="What did you learn?"
+                    value={j.description}
+                    onChange={(e) => {
+                      const upd = [...assessmentData.justifications];
+                      upd[idx].description = e.target.value;
+                      setAssessmentData((p) => ({ ...p, justifications: upd }));
+                    }}
+                    className="w-full border rounded-md p-2 text-sm"
+                  />
 
-      </div>
+                  {/* -- file upload */}
+                  <label className="mt-4 flex flex-col items-center bg-gray-200 rounded-md py-6 cursor-pointer">
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => {
+                        const upd = [...assessmentData.justifications];
+                        upd[idx].file = e.target.files[0];
+                        setAssessmentData((p) => ({
+                          ...p,
+                          justifications: upd,
+                        }));
+                      }}
+                    />
+                    <span className="text-sm font-semibold">
+                      Upload Diploma
+                    </span>
+                  </label>
+                </div>
+              ))}
+            </div>
 
-      <button
-        className="bg-blue-500 text-white px-4 py-1 rounded text-sm mx-auto block"
-        onClick={() => {
-          const fileInput = document.getElementById("new-upload");
-          const website = document.getElementById("new-website").value;
-          const description = document.getElementById("new-description").value;
-          const file = fileInput.files[0];
+            <div className="flex gap-4 mb-10">
+              <button
+                onClick={() =>
+                  setAssessmentData((p) => ({
+                    ...p,
+                    justifications: [
+                      ...p.justifications,
+                      { title: "", url: "", description: "", file: null },
+                    ],
+                  }))
+                }
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md transition-all duration-200 hover:scale-105"
+              >
+                ADD JUSTIFICATION
+              </button>
 
-          if (website && description && file) {
-            setSubmittedDiplomas(prev => [...prev, { website, description, file }]);
+              <button
+                onClick={() =>
+                  setAssessmentData((p) => ({ ...p, justifications: [] }))
+                }
+                className="border-2 border-blue-600 text-blue-600 font-bold px-6 py-2 rounded-md transition-all duration-200 hover:scale-105"
+              >
+                CLEAR ALL
+              </button>
+            </div>
 
-            // Clear form
-            document.getElementById("new-website").value = "";
-            document.getElementById("new-description").value = "";
-            fileInput.value = "";
-            setPendingDiplomaFile(null); 
-          }
-        }}
-      >
-        SUBMIT
-      </button>
-      {pendingDiplomaFile && (
-  <p className="text-xs text-gray-500 italic mt-2">
-    Uploaded: {pendingDiplomaFile.name}
-  </p>
-)}
-
-    </div>
-
-    {/* Resume of Submitted Diplomas */}
-    {submittedDiplomas.length > 0 && (
-      <>
-        <h3 className="text-md font-semibold text-gray-700 mt-6">Submitted Justifications</h3>
-        {submittedDiplomas.map((item, index) => (
-          <div key={index} className="border rounded-md p-4 bg-gray-50">
-            <p className="font-bold text-blue-700 text-sm">{item.website}</p>
-            <p className="text-sm text-gray-700 mb-2">{item.description}</p>
-            <p className="text-xs text-gray-500 italic">Diploma: {item.file.name}</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setCurrentStep(2)}
+                className="border-2 border-blue-600 text-blue-600 font-bold px-6 py-2 rounded-md transition-all duration-200 hover:scale-105"
+              >
+                RETURN
+              </button>
+              <button
+                onClick={handleFinish}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md transition-all duration-200 hover:scale-105"
+              >
+                FINISH
+              </button>
+            </div>
           </div>
-        ))}
-      </>
-    )}
-
-    {/* Navigation Buttons */}
-    <div className="flex justify-between pt-4">
-      <button
-        onClick={() => setStep(3)}
-        className="border border-blue-500 text-blue-500 px-6 py-2 rounded font-semibold"
-      >
-        RETURN
-      </button>
-
-      <button
-        className="bg-blue-500 text-white px-6 py-2 rounded font-semibold"
-        onClick={() => setStep(5)}
-      >
-        CONTINUE
-      </button>
-    </div>
-  </div>
-)}
-
-{step === 5 && (
-  <div className="flex flex-col items-center justify-center h-full w-full text-center">
-    <h2 className="text-xl md:text-2xl font-semibold text-black mb-4 p-16">
-       Congratulations! <br /> You completed the self-assesment
-    </h2>
-
-
-    <div className="flex gap-4">
-      <button
-        onClick={() => setStep(4)}
-        className="text-blue-600 text-sm font-semibold px-4"
-      >
-        GO BACK
-      </button>
-
-      <button
-        className="bg-blue-600 text-white px-6 py-2 rounded font-semibold text-sm"
-        onClick={() => {
-          console.log("Submit self-assessment!");
-          onClose();
-        }}
-      >
-        SUBMIT SELF-ASSESSMENT
-      </button>
-    </div>
-  </div>
-)}
-{showExitConfirm && (
-  <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white rounded-[14px] border-2 border-blue-500 w-[90%] max-w-md p-8 relative text-center">
-      <h2 className="text-xl font-bold text-black mb-2">Are you sure you want to exit?</h2>
-      <p className="text-black mb-6">Your progress won’t be saved</p>
-
-      <div className="flex justify-center gap-4">
-        <button
-          className="text-blue-600 font-semibold text-sm px-8"
-          onClick={onClose}
-        >
-          EXIT
-        </button>
-
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold"
-          onClick={() => setShowExitConfirm(false)}
-        >
-          CONTINUE THE ASSESSMENT
-        </button>
+        )}
       </div>
-
-      <button
-        onClick={() => setShowExitConfirm(false)}
-        className="absolute top-3 right-4 text-blue-500 text-xl font-bold"
-      >
-        ✕
-      </button>
-    </div>
-  </div>
-)}
-      </div> 
     </div>
   );
-};
-
-export default SelfAssessmentModal;
+}

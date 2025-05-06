@@ -1,28 +1,16 @@
-export default function Explanation({ isOpen, children, hoverTimeout }) {
+export default function Explanation({ isOpen, position, children }) {
   if (!isOpen) return null;
-
-  const handleMouseEnter = () => clearTimeout(hoverTimeout.current);
-
-  const handleMouseLeave = () => {
-    hoverTimeout.current = setTimeout(() => {
-      const closeEvent = new CustomEvent("closeExplanation");
-      window.dispatchEvent(closeEvent);
-    }, 200);
-  };
 
   return (
     <div
-      className="fixed inset-50 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className="absolute bg-white p-6 rounded-lg border-4 border-custom-utad-logo shadow-xl z-50"
+      style={{
+        top: position.top,
+        left: position.left,
+        width: "40rem",
+      }}
     >
-      <div
-        className="bg-white p-8 rounded-lg w-[40rem] border-custom-utad-logo border-4"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {children}
-      </div>
+      {children}
     </div>
   );
 }

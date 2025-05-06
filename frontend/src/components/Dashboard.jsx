@@ -1,10 +1,11 @@
 "use client";
-import { useState, React, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-import Explanation from "./Explanation";
+import Explanation from "@/components/Explanation";
+import SelfAssessmentModal from "@/components/SelfAssessmentModal";
 
 const Dashboard = () => {
   const [selectedTrack, setSelectedTrack] = useState("DATA ANALYST");
@@ -12,8 +13,22 @@ const Dashboard = () => {
   const [selectedDescription, setSelectedDescription] = useState("");
   const [selectedFitness, setSelectedFitness] = useState("");
 
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeout = useRef(null);
+  const [isOpenSelfAssessment, setIsOpenSelfAssessment] = useState(false);
+
+  const [isOpenExplanation, setIsOpenExplanation] = useState(false);
+  const [positionExplanation, setPositionExplanation] = useState({
+    top: 0,
+    left: 0,
+  });
+
+  const handleToggleExplanation = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPositionExplanation({
+      top: rect.bottom + window.scrollY - 425,
+      left: rect.left + window.scrollX - 2400,
+    });
+    setIsOpenExplanation((prev) => !prev);
+  };
 
   const loadDescription = async (careerTypeId) => {
     const token = localStorage.getItem("token");
@@ -89,7 +104,8 @@ const Dashboard = () => {
     }
   }, []);
 
-  const handleClick = () => {
+  // just in case assesment modal not working
+  const handleClickAssesment = () => {
     router.push("/assessment");
   };
 
@@ -105,7 +121,6 @@ const Dashboard = () => {
       router.push("/");
       return;
     }
-    console.log("profileId", profileId);
     fetch(`/api/careers/profiles/${profileId}/recommendations`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -128,13 +143,14 @@ const Dashboard = () => {
 
         const firstFitness = Math.round((top[0].fitnessScore / 5) * 100);
         setSelectedFitness(`${firstFitness}%`);
-        const initial = top.find((r) => r.careerFieldName === trackNames[0]);
+        const initial = top.find((r) => r.careerTypeId === trackNames[0].id);
         if (initial) {
           const s = initial.skillAssessments.map((skill) => ({
             name: skill.skillName,
             current: skill.currentLevel,
             desired: skill.currentLevel + (skill.gap || 0),
           }));
+          s.sort((a, b) => b.current - a.current);
           setSkills(s);
         }
       })
@@ -142,13 +158,15 @@ const Dashboard = () => {
   }, []);
 
   const aiCoachLines = [
-    "Generate a CV summary",
-    "Suggest best Career Paths",
-    "Suggest vital recommended skills to develop",
+    "A CV summary straight to your inbox",
+    "Suggestions for the best Career Paths ",
+    "Recommendations of vital skills to improve",
   ];
 
   const fileInputRef = useRef(null);
-  const [selectedFileName, setSelectedFileName] = useState("Choose CV file");
+  const [selectedFileName, setSelectedFileName] = useState(
+    "Upload your CV file"
+  );
 
   const handleSenenFeature = async () => {
     const token = localStorage.getItem("token");
@@ -203,17 +221,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleHoverStart = () => {
-    clearTimeout(hoverTimeout.current);
-    setIsHovered(true);
-  };
-
-  const handleHoverEnd = () => {
-    hoverTimeout.current = setTimeout(() => {
-      setIsHovered(false);
-    }, 3000);
-  };
-
   return (
     <div className="flex h-screen font-montserrat">
       <aside className="bg-custom-utad-logo w-[345px] fixed h-full flex flex-col justify-between py-10 px-6">
@@ -264,54 +271,7 @@ const Dashboard = () => {
       </aside>
 
       <main className="ml-[345px] w-full px-10 py-10">
-        <section className="bg-[#E5E9EC] p-5 rounded-lg">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-[28px] text-[#14192C] font-extrabold">
-                AI Career Coach
-              </h1>
-              <p className="text-[16px] text-[#14192C] font-normal mt-7">
-                With the help of AI Career Coach you will receive:
-              </p>
-              <ul className="list-disc pl-6 text-[16px] text-[#14192C] font-normal">
-                {aiCoachLines.map((line, index) => (
-                  <li key={index}>{line}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="text-center mr-40 w-1/5">
-              <p className="text-[14px] text-[#14192C] font-normal">
-                Input your CV here
-              </p>
-              <div className="flex flex-col">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files[0]) {
-                      setSelectedFileName(e.target.files[0].name);
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-2 text-[14px] font-normal text-blue-600 underline"
-                >
-                  {selectedFileName}
-                </button>
-                <button
-                  onClick={handleSenenFeature}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-[14px] font-bold hover:bg-blue-700 transition"
-                >
-                  GENERATE CAREER ADVICE
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
+        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
               <h2 className="text-[28px] font-extrabold">Career Track:</h2>
@@ -331,6 +291,7 @@ const Dashboard = () => {
                       current: skill.currentLevel,
                       desired: skill.currentLevel + (skill.gap || 0),
                     }));
+                    newSkills.sort((a, b) => b.current - a.current);
                     setSkills(newSkills);
                     setSelectedFitness(
                       `${Math.round((found.fitnessScore / 5) * 100)}%`
@@ -358,47 +319,77 @@ const Dashboard = () => {
             {selectedDescription}
           </p>
           <p className="text-[16px] font-normal text-[#383B42] mb-4">
-            You are {selectedFitness} fit for this position.
+            You are <strong>{selectedFitness}</strong> fit for this position.
           </p>
-
-          <button
-            onMouseEnter={handleHoverStart}
-            onMouseLeave={handleHoverEnd}
-            aria-label="Explanation"
-          >
-            <Image
-              src={"/svg/_/Big.svg"}
-              alt="Explanation"
-              width={20}
-              height={20}
-            />
-          </button>
-          <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
-            <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
-              What do these values represent?
-            </h1>
-            <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
-              <strong>Current level:</strong> Your current skill level in this
-              area.
-              <br />
-              <strong>Desired level:</strong> The level you should aim for to be
-              competitive in this field.
-            </p>
-          </Explanation>
-
           <div className="flex justify-between mb-1">
             <p className="font-bold text-[24px] mb-2">Skills</p>
             <div className="flex items-center text-[16px] font-bold text-[#14192C]">
               Current level | Desired
+              <div className="relative ml-2">
+                <button
+                  onClick={handleToggleExplanation}
+                  aria-label="Explanation"
+                >
+                  <Image
+                    src={"/svg/_/Big.svg"}
+                    alt="Explanation"
+                    width={20}
+                    height={20}
+                  />
+                </button>
+                <Explanation
+                  isOpen={isOpenExplanation}
+                  position={positionExplanation}
+                >
+                  <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
+                    What do these values represent?
+                  </h1>
+                  <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+                    <strong>Current level:</strong> Your current skill level in
+                    this area.
+                    <br />
+                    <strong>Desired level:</strong> The level you should aim for
+                    to be competitive in this field.
+                    <br />
+                    <strong>Fitness level:</strong> A percentage indicating how
+                    well your skills match the requirements of the position.
+                  </p>
+                </Explanation>
+              </div>
             </div>
           </div>
 
           <ul className="space-y-3">
             {skills.map((skill, i) => (
               <li key={i} className="flex items-center gap-4">
-                <span className="w-48 font-normal text-[21px] text-[#14192C]">
-                  {skill.name}
-                </span>
+                <div
+                  className="w-72 font-normal text-[21px] text-[#14192C] flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis"
+                  title={skill.name}
+                >
+                  {/* Conditional SVG image icons */}
+                  {skill.current === 5 && (
+                    <img
+                      src="/svg/Badge/Gold.svg"
+                      alt="Expert"
+                      className="w-10 h-10"
+                    />
+                  )}
+                  {skill.current > 4 && skill.current < 5 && (
+                    <img
+                      src="/svg/Badge/Silver.svg"
+                      alt="Advanced"
+                      className="w-10 h-10"
+                    />
+                  )}
+                  {skill.current >= 3 && skill.current <= 4 && (
+                    <img
+                      src="/svg/Badge/Bronze.svg"
+                      alt="Intermediate"
+                      className="w-10 h-10"
+                    />
+                  )}
+                  <span className="truncate">{skill.name}</span>
+                </div>
 
                 <div className="relative bg-gray-200 h-3 flex-1 rounded">
                   <div
@@ -430,7 +421,9 @@ const Dashboard = () => {
             ))}
           </ul>
 
-          {/* <p className="text-xs text-gray-500 mt-3">Improve a skill to level 3 to obtain a badge!</p> */}
+          <p className="text-[14px] font-bold text-gray-500 mt-5">
+            Improve a skill to level 3 to obtain a badge!
+          </p>
         </section>
 
         <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
@@ -439,11 +432,18 @@ const Dashboard = () => {
               Self-Assessment
             </h2>
             <button
-              onClick={handleClick}
+              onClick={() => setIsOpenSelfAssessment(true)}
               className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[14px] rounded-md text-center flex justify-center items-center"
             >
               COMPLETE SELF-ASSESMENT
             </button>
+            {isOpenSelfAssessment && (
+              <SelfAssessmentModal
+                key="modal"
+                isOpen={isOpenSelfAssessment}
+                onClose={() => setIsOpenSelfAssessment(false)}
+              />
+            )}
             {/* 
           </div>
           <div className="mt-4">
@@ -484,7 +484,7 @@ const Dashboard = () => {
             </button> */}
           </div>
         </section>
-        <section className="bg-white p-6 rounded-lg mb-6 border-2 border-custom-utad-logo mt-10">
+        <section className="bg-white p-6 rounded-lg border-2 border-custom-utad-logo mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-[28px] font-extrabold text-[#14192C]">
               Academic Record Assessment
@@ -666,8 +666,55 @@ const Dashboard = () => {
             </div>
           )}
         </section> */}
+        <section className="bg-[#E5E9EC] p-5 rounded-lg mt-10">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-[28px] text-[#14192C] font-extrabold">
+                AI Career Coach
+              </h1>
+              <p className="text-[16px] text-[#14192C] font-normal mt-7">
+                With the help of AI Career Coach you will receive:
+              </p>
+              <ul className="list-disc pl-6 text-[16px] text-[#14192C] font-normal">
+                {aiCoachLines.map((line, index) => (
+                  <li key={index}>{line}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="text-center w-[400px]">
+              <p className="text-[14px] text-[#14192C] font-normal">
+                Make sure to upload the latest version of your CV to use this
+                tool!
+              </p>
+              <div className="flex flex-col">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      setSelectedFileName(e.target.files[0].name);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 text-[14px] font-normal text-[#0065EF] underline"
+                >
+                  {selectedFileName}
+                </button>
+                <button
+                  onClick={handleSenenFeature}
+                  className="mt-4 bg-blue-600 text-white px-4 py-4 rounded-lg text-[14px] font-bold hover:bg-blue-700 transition"
+                >
+                  GENERATE CAREER ADVICE
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
         {/* Placeholder for upcoming features */}
-        <section className="bg-gray-100 p-6 shadow rounded border border-dashed border-gray-400 mb-10">
+        <section className="bg-gray-100 p-6 shadow rounded border border-dashed border-gray-400 mb-10 mt-10">
           <div className="text-center">
             <h2 className="text-xl font-bold text-gray-500 mb-2">
               Further development in progress...
