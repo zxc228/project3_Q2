@@ -149,30 +149,30 @@ export default function StudentProfile() {
   }, [profileId, token]);
 
   useEffect(() => {
-    const updatedSteps = [...profileSteps];
-
-    // Step 1
-    updatedSteps[0].completed =
+    const conditions = [
       userData.name !== "Name Surnames" &&
-      userData.location !== "Location" &&
-      userData.degree !== "Degree you are studying" &&
-      userData.year !== "Year of graduation" &&
-      userData.link !== "mylink.com";
+        userData.location !== "Location" &&
+        userData.degree !== "Degree you are studying" &&
+        userData.year !== "Year of graduation" &&
+        userData.link !== "mylink.com",
 
-    // Step 2
-    updatedSteps[1].completed = aboutMe.trim() !== "";
+      aboutMe.trim() !== "",
 
-    // Step 3
-    updatedSteps[2].completed = languages.length > 0;
+      languages.length > 0,
 
-    // Step 4
-    updatedSteps[3].completed = CVUploaded;
+      CVUploaded,
 
-    // Step 5
-    updatedSteps[4].completed = experience.length > 0;
+      AcademicRecordUploaded,
+    ];
+    const completedCount = conditions.filter(Boolean).length;
+
+    const updatedSteps = profileSteps.map((step, index) => ({
+      ...step,
+      completed: index < completedCount,
+    }));
 
     setProfileSteps(updatedSteps);
-  }, [userData, aboutMe, languages, CVUploaded, experience]);
+  }, [userData, aboutMe, languages, CVUploaded, AcademicRecordUploaded]);
 
   // Completion stats
   const completedCount = profileSteps.filter((s) => s.completed).length;
