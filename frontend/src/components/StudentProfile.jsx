@@ -36,38 +36,26 @@ export default function StudentProfile() {
     { label: "Step 5", completed: false }, // Academic record
   ]);
 
-  const skills = [
-    "Data Mining",
-    "Python",
-    "CSS",
-    "Web Design",
-    "Javascript",
-    "Data Cleaning",
-  ];
-
-  const skillPairs = [];
-  for (let i = 0; i < skills.length; i += 2) {
-    skillPairs.push([skills[i], skills[i + 1]]);
-  }
-
-  let CVUploaded = false;
-
-  const handleHoverStart = () => {
-    clearTimeout(hoverTimeout.current);
-    setIsHovered(true);
-  };
-
-  const handleHoverEnd = () => {
-    hoverTimeout.current = setTimeout(() => {
-      setIsHovered(false);
-    }, 3000);
-  };
-
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeout = useRef(null);
-
   const cvInputRef = useRef(null);
   const academicInputRef = useRef(null);
+
+  let CVUploaded = false;
+  let AcademicRecordUploaded = false;
+
+  const [isOpenExplanation, setIsOpenExplanation] = useState(false);
+  const [positionExplanation, setPositionExplanation] = useState({
+    top: 0,
+    left: 0,
+  });
+
+  const handleToggleExplanation = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPositionExplanation({
+      top: rect.bottom + window.scrollY - 400,
+      left: rect.left + window.scrollX - 600,
+    });
+    setIsOpenExplanation((prev) => !prev);
+  };
 
   const uploadCV = () => {
     cvInputRef.current?.click();
@@ -309,7 +297,41 @@ export default function StudentProfile() {
 
         <div className="mb-10 p-6 border rounded-md border-custom-utad-logo">
           <div className="flex justify-between items-center mb-4">
-            <p className="font-bold text-[21px]">Improve your profile</p>
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-[21px]">Improve your profile</p>
+              <div className="relative inline-block">
+                <button
+                  onClick={handleToggleExplanation}
+                  aria-label="Explanation"
+                >
+                  <Image
+                    src={"/svg/_/Big.svg"}
+                    alt="Explanation"
+                    width={20}
+                    height={20}
+                  />
+                </button>
+                <Explanation
+                  isOpen={isOpenExplanation}
+                  position={positionExplanation}
+                >
+                  <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
+                    Steps needed to improve your profile
+                  </h1>
+                  <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+                    <strong>Step 1:</strong> Fill your name and education
+                    <br />
+                    <strong>Step 2:</strong> Fill your about me section
+                    <br />
+                    <strong>Step 3:</strong> Fill your languages spoken
+                    <br />
+                    <strong>Step 4:</strong> Upload your CV
+                    <br />
+                    <strong>Step 5:</strong> Upload your academic record
+                  </p>
+                </Explanation>
+              </div>
+            </div>
             <p className="font-bold text-[21px]">
               Completed {completionPercentage}%
             </p>
@@ -350,34 +372,6 @@ export default function StudentProfile() {
               ))}
             </div>
           </div>
-          <button
-            onMouseEnter={handleHoverStart}
-            onMouseLeave={handleHoverEnd}
-            aria-label="Explanation"
-          >
-            <Image
-              src={"/svg/_/Big.svg"}
-              alt="Explanation"
-              width={20}
-              height={20}
-            />
-          </button>
-          <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
-            <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
-              Steps needed to improve your profile
-            </h1>
-            <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
-              <strong>Step 1:</strong> Fill your name and education
-              <br />
-              <strong>Step 2:</strong> Fill your about me section
-              <br />
-              <strong>Step 3:</strong> Fill your languages spoken
-              <br />
-              <strong>Step 4:</strong> Upload your CV
-              <br />
-              <strong>Step 5:</strong> Upload your academic record
-            </p>
-          </Explanation>
         </div>
 
         <div className="mt-10 w-full border rounded-md p-4 border-custom-utad-logo">
