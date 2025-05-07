@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function ForgotPassword() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setError({ email: false, api: "" }); // Clear error on change
+    setError({ email: false, api: "" });
   };
 
   const isValidEmail = (email) => {
@@ -22,27 +23,30 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isValidEmail(formData.email)) {
-      setError({ email: true, api: "" });
-      return;
-    }
+    // if (!isValidEmail(formData.email)) {
+    //   setError({ email: true, api: "" });
+    //   return;
+    // }
 
     try {
-      const res = await fetch("/api/forgot-password", {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         setError({
           email: false,
-          api: data.error || "Failed to send recovery email",
+          api: data.error || "Failed to send recovery code",
         });
       } else {
-        alert("Recovery email sent successfully!");
-        router.push("/login");
+        toast.success("Recovery code sent to your email");
+        
+        sessionStorage.setItem("recoverEmail", formData.email);
+        router.push("/account-recovery");
       }
     } catch (err) {
       console.error("Password recovery error:", err);
@@ -72,9 +76,7 @@ export default function ForgotPassword() {
             Account recovery
           </p>
           <p className="text-custom-black font-montserrat font-bold text-[20px] mt-1">
-            Insert your email to recover
-            <br />
-            your password
+            Insert your email to receive a reset code
           </p>
         </div>
 
@@ -112,7 +114,7 @@ export default function ForgotPassword() {
               className="w-[373px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[21px] rounded-md text-center flex justify-center items-center"
               aria-label="Recover password"
             >
-              RECOVER PASSWORD
+              SEND CODE
             </button>
           </div>
         </form>

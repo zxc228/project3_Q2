@@ -21,6 +21,7 @@ export default function Register() {
     email: false,
     password: false,
     confirmPassword: false,
+    studies: false,
   });
 
   const handleRoleSelection = (role) => {
@@ -49,10 +50,14 @@ export default function Register() {
         ? !studentEmailRegex.test(formData.email)
         : !professorEmailRegex.test(formData.email);
 
+    const studiesError = formData.selectedRole === "student" && !formData.studies
+
     const newErrors = {
-      email: emailError,
+      //temporary
+      email: false,
       password: !passwordRegex.test(formData.password),
       confirmPassword: formData.password !== formData.confirmPassword,
+      studies: studiesError,
     };
 
     setErrors(newErrors);
@@ -77,7 +82,8 @@ export default function Register() {
         toast.error(data.error || "Registration failed");
       } else {
         toast.success("Registration successful");
-        router.push("/");
+        router.push("/verify-email"); 
+
       }
     }
   };
@@ -159,13 +165,21 @@ export default function Register() {
                 onChange={handleInputChange}
                 disabled={formData.selectedRole === "teacher"}
                 className={`w-full border-2 px-3 py-2 mt-5 font-montserrat text-[15px] font-bold text-[#2B2B2B]
-    focus:outline-none rounded-md border-custom-utad-logo
-    ${
-      formData.selectedRole === "teacher"
-        ? "bg-gray-200 cursor-not-allowed"
-        : ""
-    }`}
+                        focus:outline-none rounded-md border-custom-utad-logo
+                        ${
+                          formData.selectedRole === "teacher"
+                            ? "bg-gray-200 cursor-not-allowed"
+                            : ""
+                        }`}
               >
+                <p
+                  className={`text-red-500 text-[16px] font-bold mt-1 transition-opacity duration-300 ${
+                    errors.studies ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  *this field is required
+                </p>
+
                 <option
                   value=""
                   className="text-[15px] font-bold text-[#2B2B2B]"

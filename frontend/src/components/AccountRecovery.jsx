@@ -1,20 +1,32 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
-// TODO
 export default function AccountRecovery() {
   const router = useRouter();
   const [formData, setFormData] = useState({
+    email: "",
+    code: "",
     newPassword: "",
     confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({
+    email: false,
+    code: false,
     newPassword: false,
     confirmPassword: false,
+    api: "",
   });
+
+  useEffect(() => {
+    const storedEmail = sessionStorage.getItem("recoverEmail");
+    if (storedEmail) {
+      setFormData((prev) => ({ ...prev, email: storedEmail }));
+    }
+  }, []);
 
   const passwordRegex = /^[a-zA-Z0-9]{7,}$/;
 
@@ -24,43 +36,49 @@ export default function AccountRecovery() {
       ...prevState,
       [name]: value,
     }));
+    setErrors((prev) => ({ ...prev, [name]: false, api: "" }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {
+      email: !formData.email,
+      code: formData.code.length !== 6,
       newPassword: !passwordRegex.test(formData.newPassword),
       confirmPassword: formData.newPassword !== formData.confirmPassword,
+      api: "",
     };
 
     setErrors(newErrors);
 
-    if (!Object.values(newErrors).includes(true)) {
-      try {
-        const res = await fetch("/api/reset-password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: formData.newPassword }),
-        });
+    if (Object.values(newErrors).some((val) => val)) {
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
 
-        if (!res.ok) {
-          let errorMessage;
-          try {
-            const data = await res.json();
-            errorMessage = data.error;
-          } catch {
-            errorMessage = "Failed to reset password";
-          }
-          alert(errorMessage);
-        } else {
-          alert("Password successfully changed!");
-          router.push("/login");
-        }
-      } catch (error) {
-        console.error("Reset password error:", error);
-        alert("Failed to update password. Please try again.");
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          code: formData.code,
+          newPassword: formData.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrors((prev) => ({ ...prev, api: data.error || "Reset failed" }));
+      } else {
+        toast.success("Password successfully changed!");
+        router.push("/login");
       }
+    } catch (error) {
+      toast.error("Something went wrong");
+      console.error("Reset password error:", error);
     }
   };
 
@@ -72,67 +90,71 @@ export default function AccountRecovery() {
           alt="U-Tad Logo"
           width={700}
           height={600}
-          priority={true}
+          priority
           className="max-h-full object-contain w-full"
         />
       </div>
 
       <div className="w-1/2 flex flex-col justify-center items-center bg-white px-16">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h1 className="text-[36px] font-montserrat font-[900] text-[#14192C] leading-[42px]">
-            Create a new password
+            Reset your password
           </h1>
+          <p className="mt-2 font-montserrat font-semibold text-[18px] text-gray-600">
+            Enter the 6-digit code and choose a new password
+          </p>
         </div>
 
-        <div className="w-full max-w-[562px]">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-16">
+        <form onSubmit={handleSubmit} className="w-full max-w-[562px]">
+          {["email", "code", "newPassword", "confirmPassword"].map((field) => (
+            <div className="mb-8" key={field}>
               <input
-                type="password"
-                name="newPassword"
-                placeholder="New password"
-                value={formData.newPassword}
+                type={field.toLowerCase().includes("password") ? "password" : "text"}
+                name={field}
+                placeholder={
+                  field === "email"
+                    ? "Your U-TAD email"
+                    : field === "code"
+                    ? "6-digit recovery code"
+                    : field === "newPassword"
+                    ? "New password"
+                    : "Repeat new password"
+                }
+                value={formData[field]}
                 onChange={handleInputChange}
                 className={`w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none ${
-                  errors.newPassword ? "border-red-500" : "border-[#0065EF]"
+                  errors[field] ? "border-red-500" : "border-[#0065EF]"
                 } text-[#6F7276] font-bold`}
               />
-              {errors.newPassword && (
+              {errors[field] && (
                 <p className="text-red-500 text-sm mt-1">
-                  *Password must be at least 7 characters long and contain only
-                  letters and numbers*
+                  {field === "code"
+                    ? "*Code must be 6 digits"
+                    : field === "newPassword"
+                    ? "*Min. 7 characters, only letters/numbers"
+                    : field === "confirmPassword"
+                    ? "*Passwords do not match"
+                    : "*This field is required"}
                 </p>
               )}
             </div>
+          ))}
 
-            <div className="mb-16">
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Repeat new password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className={`w-full border-b-4 py-2 px-3 font-montserrat text-[24px] focus:outline-none ${
-                  errors.confirmPassword ? "border-red-500" : "border-[#0065EF]"
-                } text-[#6F7276] font-bold`}
-              />
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  *Passwords do not match*
-                </p>
-              )}
-            </div>
+          {errors.api && (
+            <p className="text-red-500 text-[16px] font-semibold mb-4">
+              {errors.api}
+            </p>
+          )}
 
-            <div className="flex justify-center mt-10">
-              <button
-                type="submit"
-                className="bg-[#0065EF] text-white font-montserrat font-bold text-[21px] py-[18px] px-16 rounded-lg uppercase leading-[21px] hover:bg-blue-700 transition-colors"
-              >
-                Create new password
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-center mt-6">
+            <button
+              type="submit"
+              className="bg-[#0065EF] text-white font-montserrat font-bold text-[21px] py-[18px] px-16 rounded-lg uppercase leading-[21px] hover:bg-blue-700 transition-colors"
+            >
+              Create new password
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

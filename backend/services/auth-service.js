@@ -46,6 +46,10 @@ class AuthService {
     try {
       const user = await this.authDAO.getUserByEmail(email);
       if (!user) throw new Error('Invalid credentials');
+
+      if (!user.verify) {
+        throw new Error('Email not verified');
+      }
   
       const validPassword = await bcrypt.compare(password, user.passwordhash);
       if (!validPassword) throw new Error('Invalid credentials');
@@ -66,9 +70,13 @@ class AuthService {
       // проверка наличия профиля
       const checkQuery = `SELECT 1 FROM "Profile" WHERE userid = $1`;
       const existing = await pool.query(checkQuery, [user.id]);
-
+      console.log('🔍 Creating profile with:', {
+        profileId, userId: user.id, role: user.role, studies: user.studies
+      });
+      
       if (existing.rowCount === 0) {
         // только если у студента есть degreeId
+        
         if (user.role === 'STUDENT' && user.studies) {
           await pool.query(`
             INSERT INTO "Profile" 
@@ -85,7 +93,7 @@ class AuthService {
           ]);
       
           console.log(`🟢 Profile created for student ${user.id}`);
-        } else if (user.role === 'TECAHER') {
+        } else if (user.role === 'TEAСHER') {
           await pool.query(`
             INSERT INTO "Profile" 
             (id, userid, firstname, lastname, graduationyear, bio)

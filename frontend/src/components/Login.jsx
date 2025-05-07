@@ -53,7 +53,9 @@ export default function Login() {
     e.preventDefault();
 
     const newErrors = {
-      email: !emailRegex.test(formData.email),
+      //temporary
+      email: false,
+      //email: !emailRegex.test(formData.email),
       password: formData.password.length < 8,
     };
 
