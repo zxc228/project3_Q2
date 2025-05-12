@@ -74,7 +74,7 @@ export default function AccountRecovery() {
         setErrors((prev) => ({ ...prev, api: data.error || "Reset failed" }));
       } else {
         toast.success("Password successfully changed!");
-        router.push("/login");
+        router.push("/");
       }
     } catch (error) {
       toast.error("Something went wrong");
