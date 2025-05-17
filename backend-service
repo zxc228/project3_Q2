@@ -1,0 +1,25 @@
+sudo nano /etc/systemd/system/project3_q2-backend.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable project3_q2-backend
+sudo systemctl start project3_q2-backend
+
+
+
+
+[Unit]
+Description=Project3 Q2 Backend Node Server
+After=network.target
+
+[Service]
+Type=simple
+User=ilya
+WorkingDirectory=/home/ilya/project3_Q2/backend
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+Environment=NODE_ENV=production
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

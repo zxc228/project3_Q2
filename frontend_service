@@ -1,0 +1,28 @@
+sudo nano /etc/systemd/system/project3_q2-frontend.service
+
+
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable project3_q2-frontend
+sudo systemctl start project3_q2-frontend
+
+
+sudo systemctl restart project3_q2-frontend
+
+[Unit]
+Description=Next.js App
+After=network.target
+
+[Service]
+Type=simple
+User=ilya
+WorkingDirectory=/home/ilya/project3_Q2/frontend
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+Environment=NODE_ENV=production
+# Если нужен вывод логов
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

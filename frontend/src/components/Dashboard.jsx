@@ -21,6 +21,11 @@ const Dashboard = () => {
     left: 0,
   });
 
+
+  const comingSoon = () =>
+  toast("Sorry, this feature is not available yet.", {
+    position: "top-center",
+  });
   const handleToggleExplanation = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setPositionExplanation({
@@ -485,15 +490,22 @@ const Dashboard = () => {
           </div>
         </section>
         <section className="bg-white p-6 rounded-lg border-2 border-custom-utad-logo mt-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-[28px] font-extrabold text-[#14192C]">
-              Academic Record Assessment
-            </h2>
-            <button className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo text-white font-montserrat font-bold text-[14px] rounded-md text-center flex justify-center items-center">
-              COMPLETE ACADEMIC RECORD ASSESSMENT
-            </button>
-          </div>
-        </section>
+            <div className="flex justify-between items-center">
+              <h2 className="text-[28px] font-extrabold text-[#14192C]">
+                Academic Record Assessment
+              </h2>
+              <button
+                onClick={comingSoon}
+                title="Coming soon"
+                className="w-[400px] h-[60px] py-[18px] px-[64px] bg-custom-utad-logo
+                          text-white font-montserrat font-bold text-[14px] rounded-md
+                          text-center flex justify-center items-center
+                          opacity-50 cursor-not-allowed"
+              >
+                COMPLETE ACADEMIC RECORD ASSESSMENT
+              </button>
+            </div>
+          </section>
 
         {/* Personal Progress Section
         <section

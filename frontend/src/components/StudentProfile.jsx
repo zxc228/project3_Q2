@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Explanation from "./Explanation";
+import { toast } from "react-hot-toast";
 
 export default function StudentProfile() {
   const router = useRouter();
@@ -14,6 +15,13 @@ export default function StudentProfile() {
       router.push("/");
     }
   }, []);
+
+
+  const comingSoon = () =>
+  toast("Sorry, this feature is not available yet.", {
+    position: "top-center",
+  });
+
   const [userData, setUserData] = useState({
     name: "Name Surnames",
     location: "Location",
@@ -260,9 +268,16 @@ export default function StudentProfile() {
             </div>
           </div>
           <div className="flex flex-col">
-            <button className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px]">
+            <button
+              onClick={comingSoon}
+              title="Coming soon"
+              className="border-2 border-custom-utad-logo text-custom-utad-logo
+                        font-bold px-10 py-2 rounded-md text-[18px] opacity-50 cursor-not-allowed">
               SHARE PROFILE
             </button>
+            {/* <button className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px]">
+              SHARE PROFILE
+            </button> */}
             <button
               className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px] mt-5"
               onClick={handleSaveChanges}
@@ -437,6 +452,7 @@ export default function StudentProfile() {
           </div>
 
           <div className="border border-custom-utad-logo rounded-md p-4 w-3/4 flex flex-col gap-4">
+           
             <input
               type="file"
               ref={cvInputRef}
@@ -449,23 +465,26 @@ export default function StudentProfile() {
               onChange={handleAcademicChange}
               className="hidden"
             />
+
+            {/* UPLOAD CV */}
             <button
-              className="bg-[#E5E9EC] items-center flex flex-col text-custom-utad-logo text-[18px] font-600 rounded-md py-6"
-              onClick={uploadCV}
+              onClick={comingSoon}
+              title="Coming soon"
+              className="bg-[#E5E9EC] items-center flex flex-col text-custom-utad-logo
+                        text-[18px] font-600 rounded-md py-6 opacity-50 cursor-not-allowed"
             >
               <Image src="/upload.png" width={35} height={46} alt="Upload CV" />
               <p className="mt-5">UPLOAD CV</p>
             </button>
+
+            {/* UPLOAD ACADEMIC RECORD */}
             <button
-              className="bg-[#E5E9EC] items-center flex flex-col text-custom-utad-logo text-[18px] font-600 rounded-md py-6"
-              onClick={uploadAcademicRecord}
+              onClick={comingSoon}
+              title="Coming soon"
+              className="bg-[#E5E9EC] items-center flex flex-col text-custom-utad-logo
+                        text-[18px] font-600 rounded-md py-6 opacity-50 cursor-not-allowed"
             >
-              <Image
-                src="/upload.png"
-                width={35}
-                height={46}
-                alt="Upload Academic Record"
-              />
+              <Image src="/upload.png" width={35} height={46} alt="Upload Academic Record" />
               <p className="mt-5">UPLOAD ACADEMIC RECORD</p>
             </button>
           </div>
