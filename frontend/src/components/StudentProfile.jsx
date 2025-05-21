@@ -4,8 +4,9 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Explanation from "./Explanation";
 import { toast } from "react-hot-toast";
+import Explanation from "./Explanation";
+import jsPDF from "jspdf";
 
 export default function StudentProfile() {
   const router = useRouter();
@@ -19,6 +20,11 @@ export default function StudentProfile() {
 
   const comingSoon = () =>
   toast("Sorry, this feature is not available yet.", {
+    position: "top-center",
+  });
+
+  const changesSaved = () =>
+  toast.success("Changes saved!", {
     position: "top-center",
   });
 
@@ -43,6 +49,20 @@ export default function StudentProfile() {
     { label: "Step 4", completed: false }, // Upload CV
     { label: "Step 5", completed: false }, // Academic record
   ]);
+
+  const handleHoverStart = () => {
+    clearTimeout(hoverTimeout.current);
+    setIsHovered(true);
+  };
+
+  const handleHoverEnd = () => {
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 3000);
+  };
+
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeout = useRef(null);
 
   const cvInputRef = useRef(null);
   const academicInputRef = useRef(null);
@@ -117,6 +137,144 @@ export default function StudentProfile() {
     }
   };
 
+  const [skills, setSkills] = useState([]);
+
+  const retrieveSkills = async () => {
+    try {
+      const response = await fetch(`/api/skills/profiles/${profileId}/skills`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // console.log("Response:", response);
+      if (!response.ok) throw new Error("Failed to fetch skills");
+      const data = await response.json();
+      // console.log("Skills API data:", data);
+      setSkills(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (profileId && token) {
+      retrieveUserData();
+      retrieveSkills();
+    }
+  }, [profileId, token]);
+
+
+  // Function to generate PDF
+  const handleShareProfile = async () => {
+    const doc = new jsPDF();
+
+    let y = 15;
+
+    // Section: Student Info
+    doc.setFontSize(18);
+    doc.setFont("montserrat", "bold");
+    doc.text("Student Info", 10, y);
+    y += 8;
+
+    doc.setFontSize(12);
+    doc.setFont("montserrat", "normal");
+    doc.text(`Name: ${userData.name}`, 12, y);
+    y += 7;
+    doc.text(`Location: ${userData.location}`, 12, y);
+    y += 7;
+    doc.text(`Degree: ${userData.degree}`, 12, y);
+    y += 7;
+    doc.text(`Graduation Year: ${userData.year}`, 12, y);
+    y += 15; // Extra margin
+
+    // Section: About Me (blue box, rounded corners)
+    doc.setFontSize(16);
+    doc.setFont("montserrat", "bold");
+    doc.text("About Me", 10, y);
+    y += 8;
+    doc.setFontSize(12);
+    doc.setFont("montserrat", "normal");
+    // Calculate text lines and dynamic height
+    const aboutMeLines = doc.splitTextToSize(aboutMe || "-", 180);
+    const aboutMeHeight = aboutMeLines.length * 7 + 6; // 7 is line height, 6 is padding
+
+    doc.setDrawColor(37, 99, 235); // Tailwind blue-600
+    doc.roundedRect(10, y, 190, aboutMeHeight, 4, 4, "S");
+    doc.text(aboutMeLines, 14, y + 7);
+
+    y += aboutMeHeight + 14; // Move y for next section
+
+    // Section: Languages
+    doc.setFontSize(16);
+    doc.setFont("montserrat", "bold");
+    doc.text("Languages", 10, y);
+    y += 8;
+    doc.setFontSize(12);
+    doc.setFont("montserrat", "normal");
+    if (languages.length === 0) {
+      doc.text("- None", 12, y);
+      y += 8;
+    } else {
+      languages.forEach((lang) => {
+        doc.text(`- ${lang.name || ""} (${lang.level || ""})`, 12, y);
+        y += 7;
+      });
+    }
+    y += 10; // Extra margin
+
+    // Section: Skills (badge, name, level columns)
+    doc.setFontSize(16);
+    doc.setFont("montserrat", "bold");
+    doc.text("Skills", 10, y);
+    y += 8;
+    doc.setFontSize(12);
+    doc.setFont("montserrat", "normal");
+
+    if (skills.length === 0) {
+      doc.text("- None", 12, y);
+    } else {
+      // Prepare badge images (fetch and convert to base64)
+      const badgePaths = [
+        "/svg/Badge/medal-1.png",
+        "/svg/Badge/medal-2.png",
+        "/svg/Badge/medal-3.png",
+      ];
+
+      const fetchBadgeBase64 = async (path) => {
+        const res = await fetch(path);
+        const blob = await res.blob();
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      };
+
+      const badgeImages = await Promise.all(
+        badgePaths.map((path) => fetchBadgeBase64(path))
+      );
+
+      // Table headers
+      doc.setFont("montserrat", "bold");
+      doc.text("Badge", 20, y);
+      doc.text("Skill", 50, y);
+      doc.text("Level", 170, y);
+      doc.setFont("montserrat", "normal");
+      y += 6;
+
+      skills.forEach((skill, idx) => {
+        const badgeImg = badgeImages[idx % badgeImages.length];
+        // Badge
+        doc.addImage(badgeImg, "PNG", 15, y - 4, 8, 8);
+        // Name
+        doc.text(`${skill.skillname || skill.name || ""}`, 50, y + 2);
+        // Level
+        doc.text(`${skill.skilllevel || 0}`, 170, y + 2);
+        y += 12;
+      });
+    }
+
+    doc.save("student-profile.pdf");
+  };
+
   // Function to save profile changes
   const handleSaveChanges = async () => {
     const profileData = {
@@ -145,6 +303,7 @@ export default function StudentProfile() {
 
       const data = await response.json();
       console.log("Profile updated successfully:", data);
+      changesSaved();
     } catch (error) {
       console.error(error);
     }
@@ -268,16 +427,10 @@ export default function StudentProfile() {
             </div>
           </div>
           <div className="flex flex-col">
-            <button
-              onClick={comingSoon}
-              title="Coming soon"
-              className="border-2 border-custom-utad-logo text-custom-utad-logo
-                        font-bold px-10 py-2 rounded-md text-[18px] opacity-50 cursor-not-allowed">
+            <button className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px] mt-5"
+            onClick={handleShareProfile}>
               SHARE PROFILE
             </button>
-            {/* <button className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px]">
-              SHARE PROFILE
-            </button> */}
             <button
               className="border-2 border-custom-utad-logo text-custom-utad-logo font-bold px-10 py-2 rounded-md text-[18px] mt-5"
               onClick={handleSaveChanges}
@@ -387,6 +540,34 @@ export default function StudentProfile() {
               ))}
             </div>
           </div>
+          <button
+            onMouseEnter={handleHoverStart}
+            onMouseLeave={handleHoverEnd}
+            aria-label="Explanation"
+          >
+            <Image
+              src={"/svg/_/Big.svg"}
+              alt="Explanation"
+              width={20}
+              height={20}
+            />
+          </button>
+          <Explanation isOpen={isHovered} hoverTimeout={hoverTimeout}>
+            <h1 className="text-custom-black font-montserrat font-extrabold text-[28px]">
+              Steps needed to improve your profile
+            </h1>
+            <p className="text-custom-black font-normal font-montserrat text-[14px] mt-5">
+              <strong>Step 1:</strong> Fill your name and education
+              <br />
+              <strong>Step 2:</strong> Fill your about me section
+              <br />
+              <strong>Step 3:</strong> Fill your languages spoken
+              <br />
+              <strong>Step 4:</strong> Upload your CV
+              <br />
+              <strong>Step 5:</strong> Upload your academic record
+            </p>
+          </Explanation>
         </div>
 
         <div className="mt-10 w-full border rounded-md p-4 border-custom-utad-logo">
@@ -484,7 +665,12 @@ export default function StudentProfile() {
               className="bg-[#E5E9EC] items-center flex flex-col text-custom-utad-logo
                         text-[18px] font-600 rounded-md py-6 opacity-50 cursor-not-allowed"
             >
-              <Image src="/upload.png" width={35} height={46} alt="Upload Academic Record" />
+              <Image
+                src="/upload.png"
+                width={35}
+                height={46}
+                alt="Upload Academic Record"
+              />
               <p className="mt-5">UPLOAD ACADEMIC RECORD</p>
             </button>
           </div>
