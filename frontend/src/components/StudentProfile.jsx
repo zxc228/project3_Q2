@@ -28,6 +28,13 @@ export default function StudentProfile() {
     position: "top-center",
   });
 
+  function getMedal(value) {
+    if (value >= 4.5) return "/svg/Badge/medal-1.png";
+    if (value >= 3.5) return "/svg/Badge/medal-2.png";
+    if (value >= 2.5) return "/svg/Badge/medal-3.png";
+    return "";
+  }
+
   const [userData, setUserData] = useState({
     name: "Name Surnames",
     location: "Location",
@@ -231,7 +238,7 @@ export default function StudentProfile() {
     if (skills.length === 0) {
       doc.text("- None", 12, y);
     } else {
-      // Prepare badge images (fetch and convert to base64)
+      // Loading badge paths
       const badgePaths = [
         "/svg/Badge/medal-1.png",
         "/svg/Badge/medal-2.png",
@@ -248,9 +255,11 @@ export default function StudentProfile() {
         });
       };
 
-      const badgeImages = await Promise.all(
-        badgePaths.map((path) => fetchBadgeBase64(path))
-      );
+      // Load all badge images
+      const badgeImagesMap = {};
+      for (const path of badgePaths) {
+        badgeImagesMap[path] = await fetchBadgeBase64(path);
+      }
 
       // Table headers
       doc.setFont("montserrat", "bold");
@@ -260,13 +269,12 @@ export default function StudentProfile() {
       doc.setFont("montserrat", "normal");
       y += 6;
 
-      skills.forEach((skill, idx) => {
-        const badgeImg = badgeImages[idx % badgeImages.length];
-        // Badge
-        doc.addImage(badgeImg, "PNG", 15, y - 4, 8, 8);
-        // Name
+      skills.forEach((skill) => {
+        const badgePath = getMedal(Number(skill.skilllevel || 0));
+        if (badgePath) {
+          doc.addImage(badgeImagesMap[badgePath], "PNG", 15, y - 4, 8, 8);
+        }
         doc.text(`${skill.skillname || skill.name || ""}`, 50, y + 2);
-        // Level
         doc.text(`${skill.skilllevel || 0}`, 170, y + 2);
         y += 12;
       });

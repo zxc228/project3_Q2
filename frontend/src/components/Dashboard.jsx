@@ -372,21 +372,21 @@ const Dashboard = () => {
                   title={skill.name}
                 >
                   {/* Conditional SVG image icons */}
-                  {skill.current === 5 && (
+                  {skill.current >= 4.5 && (
                     <img
                       src="/svg/Badge/Gold.svg"
                       alt="Expert"
                       className="w-10 h-10"
                     />
                   )}
-                  {skill.current > 4 && skill.current < 5 && (
+                  {skill.current >= 3.5 && skill.current <= 4 && (
                     <img
                       src="/svg/Badge/Silver.svg"
                       alt="Advanced"
                       className="w-10 h-10"
                     />
                   )}
-                  {skill.current >= 3 && skill.current <= 4 && (
+                  {skill.current >= 3 && skill.current < 3.5 && (
                     <img
                       src="/svg/Badge/Bronze.svg"
                       alt="Intermediate"
